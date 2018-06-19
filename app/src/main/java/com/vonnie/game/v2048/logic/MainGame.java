@@ -1,14 +1,15 @@
 package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.vonnie.game.v2048.cell.Cell;
 import com.vonnie.game.v2048.cell.Tile;
+import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.grid.AnimGrid;
 import com.vonnie.game.v2048.grid.Grid;
-import com.vonnie.game.v2048.weiget.MainView;
+import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
+import com.vonnie.game.v2048.weiget.GameView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,30 +27,28 @@ public class MainGame {
 
     public static final int FADE_GLOBAL_ANIMATION = 0;
 
-    public static final long MOVE_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-    public static final long SPAWN_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-    public static final long NOTIFICATION_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME * 5;
-    public static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
-    private static final String HIGH_SCORE = "high score";
+    private static final long MOVE_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME;
+    private static final long SPAWN_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME;
+    private static final long NOTIFICATION_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME * 5;
+    private static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
 
-    public static final int STARTING_MAX_VALUE = 2048;
-    public static int endingMaxValue;
+    private static final long STARTING_MAX_VALUE = 32;
+    private static long endingMaxValue;
 
-    //Odd state = game is not active
-    //Even state = game is active
-    //Win state = active state + 1
-    public static final int GAME_WIN = 1;
-    public static final int GAME_LOST = -1;
-    public static final int GAME_NORMAL = 0;
-    public static final int GAME_NORMAL_WON = 1;
-    public static final int GAME_ENDLESS = 2;
-    public static final int GAME_ENDLESS_WON = 3;
+    private static final int GAME_WIN = 1;
+    private static final int GAME_LOST = -1;
+    private static final int GAME_NORMAL = 0;
+    private static final int GAME_ENDLESS = 2;
+    private static final int GAME_ENDLESS_WON = 3;
 
     public Grid grid = null;
     public AnimGrid aGrid;
     public final int numSquaresX = 4;
     public final int numSquaresY = 4;
-    public final int startTiles = 4;
+    /**
+     * init start cell count
+     */
+    private final int startTiles = 2;
 
     public int gameState = 0;
     public boolean canUndo;
@@ -65,12 +64,14 @@ public class MainGame {
 
     private Context mContext;
 
-    private MainView mView;
+    private GameView mView;
 
-    public MainGame(Context context, MainView view) {
+    public MainGame(Context context, GameView view) {
         mContext = context;
         mView = view;
-        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
+//        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
+        endingMaxValue = Long.MAX_VALUE;
+        Log.i("ABC", "endingMaxValue:" + endingMaxValue);
     }
 
     public void newGame() {
@@ -116,15 +117,11 @@ public class MainGame {
     }
 
     private void recordHighScore() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putLong(HIGH_SCORE, highScore);
-        editor.apply();
+        SharedPreferenceUtil.put(mContext, SpConstant.HIGH_SCORE, highScore);
     }
 
     private long getHighScore() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return settings.getLong(HIGH_SCORE, -1);
+        return (long) SharedPreferenceUtil.get(mContext, SpConstant.HIGH_SCORE, -1L);
     }
 
     private void prepareTiles() {
@@ -215,10 +212,9 @@ public class MainGame {
                         tile.updatePosition(positions[1]);
 
                         int[] extras = {xx, yy};
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION,
-                                MOVE_ANIMATION_TIME, 0, extras); //Direction: 0 = MOVING MERGED
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MERGE_ANIMATION,
-                                SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
+                        //Direction: 0 = MOVING MERGED
+                        aGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
+                        aGrid.startAnimation(merged.getX(), merged.getY(), MERGE_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
 
                         // Update the score
                         score = score + merged.getValue();
@@ -226,13 +222,15 @@ public class MainGame {
 
                         // The mighty 2048 tile
                         if (merged.getValue() >= winValue() && !gameWon()) {
-                            gameState = gameState + GAME_WIN; // Set win state
+                            // Set win state
+                            gameState = gameState + GAME_WIN;
                             endGame();
                         }
                     } else {
                         moveTile(tile, positions[0]);
                         int[] extras = {xx, yy, 0};
-                        aGrid.startAnimation(positions[0].getX(), positions[0].getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras); //Direction: 1 = MOVING NO MERGE
+                        //Direction: 1 = MOVING NO MERGE
+                        aGrid.startAnimation(positions[0].getX(), positions[0].getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
                     }
 
                     if (!positionsEqual(cell, tile)) {
@@ -268,16 +266,20 @@ public class MainGame {
 
     private Cell getVector(int direction) {
         Cell[] map = {
-                new Cell(0, -1), // up
-                new Cell(1, 0),  // right
-                new Cell(0, 1),  // down
-                new Cell(-1, 0)  // left
+                // up
+                new Cell(0, -1),
+                // right
+                new Cell(1, 0),
+                // down
+                new Cell(0, 1),
+                // left
+                new Cell(-1, 0)
         };
         return map[direction];
     }
 
     private List<Integer> buildTraversalsX(Cell vector) {
-        List<Integer> traversals = new ArrayList<Integer>();
+        List<Integer> traversals = new ArrayList<>();
 
         for (int xx = 0; xx < numSquaresX; xx++) {
             traversals.add(xx);
@@ -290,7 +292,7 @@ public class MainGame {
     }
 
     private List<Integer> buildTraversalsY(Cell vector) {
-        List<Integer> traversals = new ArrayList<Integer>();
+        List<Integer> traversals = new ArrayList<>();
 
         for (int xx = 0; xx < numSquaresY; xx++) {
             traversals.add(xx);
@@ -311,8 +313,7 @@ public class MainGame {
                     previous.getY() + vector.getY());
         } while (grid.isCellWithinBounds(nextCell) && grid.isCellAvailable(nextCell));
 
-        Cell[] answer = {previous, nextCell};
-        return answer;
+        return new Cell[]{previous, nextCell};
     }
 
     private boolean movesAvailable() {
@@ -348,7 +349,7 @@ public class MainGame {
         return first.getX() == second.getX() && first.getY() == second.getY();
     }
 
-    private int winValue() {
+    private long winValue() {
         if (!canContinue()) {
             return endingMaxValue;
         } else {

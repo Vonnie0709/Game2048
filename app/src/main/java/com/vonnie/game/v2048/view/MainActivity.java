@@ -1,14 +1,16 @@
 package com.vonnie.game.v2048.view;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 
 import com.vonnie.game.v2048.cell.Tile;
-import com.vonnie.game.v2048.weiget.MainView;
+import com.vonnie.game.v2048.constant.SpConstant;
+import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
+import com.vonnie.game.v2048.weiget.GameView;
 
 /**
  * @author LongpingZou
@@ -16,44 +18,32 @@ import com.vonnie.game.v2048.weiget.MainView;
 public class MainActivity extends AppCompatActivity {
 
 
-    public static final String WIDTH = "width";
-    public static final String HEIGHT = "height";
-    public static final String SCORE = "score";
-    public static final String HIGH_SCORE = "high score temp";
-    public static final String UNDO_SCORE = "undo score";
-    public static final String CAN_UNDO = "can undo";
-    public static final String UNDO_GRID = "undo";
-    public static final String GAME_STATE = "game state";
-    public static final String UNDO_GAME_STATE = "undo game state";
-    private MainView view;
+    private GameView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        view = new MainView(getBaseContext());
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        view.hasSaveState = settings.getBoolean("save_state", false);
+        view = new GameView(getBaseContext());
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.getBoolean("hasState")) {
+            if (savedInstanceState.getBoolean(SpConstant.SAVE_INSTANCE)) {
                 load();
             }
         }
         setContentView(view);
 
-        // 加载酷果广告
-//        loadKGAds();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
-        // 加载有米广告
-//        loadYMAds();
 
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            //Do nothing
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
             view.game.move(2);
@@ -74,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putBoolean("hasState", true);
+        savedInstanceState.putBoolean(SpConstant.SAVE_INSTANCE, true);
         save();
     }
 
@@ -85,34 +75,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void save() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = settings.edit();
         Tile[][] field = view.game.grid.field;
         Tile[][] undoField = view.game.grid.undoField;
-        editor.putInt(WIDTH, field.length);
-        editor.putInt(HEIGHT, field.length);
+        SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
+        SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
+        Log.i("ABC", "fieldLength:" + field.length);
         for (int xx = 0; xx < field.length; xx++) {
             for (int yy = 0; yy < field[0].length; yy++) {
                 if (field[xx][yy] != null) {
-                    editor.putInt(xx + " " + yy, field[xx][yy].getValue());
+                    SharedPreferenceUtil.put(this, xx + "_" + yy, field[xx][yy].getValue());
                 } else {
-                    editor.putInt(xx + " " + yy, 0);
+                    SharedPreferenceUtil.put(this, xx + "_" + yy, 0);
                 }
 
                 if (undoField[xx][yy] != null) {
-                    editor.putInt(UNDO_GRID + xx + " " + yy, undoField[xx][yy].getValue());
+                    SharedPreferenceUtil.put(this, SpConstant.UNDO_GRID + xx + "_" + yy, undoField[xx][yy].getValue());
                 } else {
-                    editor.putInt(UNDO_GRID + xx + " " + yy, 0);
+                    SharedPreferenceUtil.put(this, SpConstant.UNDO_GRID + xx + "_" + yy, 0);
                 }
             }
         }
-        editor.putLong(SCORE, view.game.score);
-        editor.putLong(HIGH_SCORE, view.game.highScore);
-        editor.putLong(UNDO_SCORE, view.game.lastScore);
-        editor.putBoolean(CAN_UNDO, view.game.canUndo);
-        editor.putInt(GAME_STATE, view.game.gameState);
-        editor.putInt(UNDO_GAME_STATE, view.game.lastGameState);
-        editor.apply();
+        SharedPreferenceUtil.put(this, SpConstant.SCORE, view.game.score);
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_TEMP, view.game.highScore);
+        SharedPreferenceUtil.put(this, SpConstant.UNDO_SCORE, view.game.lastScore);
+        SharedPreferenceUtil.put(this, SpConstant.CAN_UNDO, view.game.canUndo);
+        SharedPreferenceUtil.put(this, SpConstant.GAME_STATE, view.game.gameState);
+        SharedPreferenceUtil.put(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
+        Log.i("ABC", "save:view.game.gameState:" + view.game.gameState);
     }
 
     @Override
@@ -125,17 +114,16 @@ public class MainActivity extends AppCompatActivity {
         //Stopping all animations
         view.game.aGrid.cancelAnimations();
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         for (int xx = 0; xx < view.game.grid.field.length; xx++) {
             for (int yy = 0; yy < view.game.grid.field[0].length; yy++) {
-                int value = settings.getInt(xx + " " + yy, -1);
+                int value = (int) SharedPreferenceUtil.get(this, xx + "_" + yy, -1);
                 if (value > 0) {
                     view.game.grid.field[xx][yy] = new Tile(xx, yy, value);
                 } else if (value == 0) {
                     view.game.grid.field[xx][yy] = null;
                 }
 
-                int undoValue = settings.getInt(UNDO_GRID + xx + " " + yy, -1);
+                int undoValue = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GRID + xx + "_" + yy, -1);
                 if (undoValue > 0) {
                     view.game.grid.undoField[xx][yy] = new Tile(xx, yy, undoValue);
                 } else if (value == 0) {
@@ -144,12 +132,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        view.game.score = settings.getLong(SCORE, view.game.score);
-        view.game.highScore = settings.getLong(HIGH_SCORE, view.game.highScore);
-        view.game.lastScore = settings.getLong(UNDO_SCORE, view.game.lastScore);
-        view.game.canUndo = settings.getBoolean(CAN_UNDO, view.game.canUndo);
-        view.game.gameState = settings.getInt(GAME_STATE, view.game.gameState);
-        view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
+        view.game.score = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, view.game.score);
+        view.game.highScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, view.game.highScore);
+        view.game.lastScore = (long) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, view.game.lastScore);
+        view.game.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, view.game.canUndo);
+        view.game.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, view.game.gameState);
+        view.game.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
+        Log.i("ABC", "get:view.game.gameState:" + view.game.gameState);
     }
 
 //    /**

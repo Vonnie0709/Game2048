@@ -1,9 +1,10 @@
 package com.vonnie.game.v2048.logic;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.vonnie.game.v2048.weiget.MainView;
+import com.vonnie.game.v2048.weiget.GameView;
 
 /**
  * @author LongpingZou
@@ -27,9 +28,9 @@ public class OperationListener implements View.OnTouchListener {
     private int veryLastDirection = 1;
     private boolean hasMoved = false;
 
-    private MainView mView;
+    private GameView mView;
 
-    public OperationListener(MainView view) {
+    public OperationListener(GameView view) {
         super();
         this.mView = view;
     }
@@ -122,9 +123,9 @@ public class OperationListener implements View.OnTouchListener {
                         mView.game.newGame();
                     } else if (iconPressed(mView.sXUndo, mView.sYIcons)) {
                         mView.game.revertUndoState();
-                    } else if (isTap(2) && inRange(mView.startingX, x, mView.endingX)
-                            && inRange(mView.startingY, x, mView.endingY) && mView.continueButtonEnabled) {
+                    } else if (isTap(2) && inRange(mView.startingX, x, mView.endingX) && inRange(mView.startingY, x, mView.endingY) && mView.continueButtonEnabled) {
                         mView.game.setEndlessMode();
+                        Log.i("ABC", "hah");
                     }
                 }
             default:

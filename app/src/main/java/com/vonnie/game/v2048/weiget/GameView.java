@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 
 import com.vonnie.game.v2048.R;
@@ -22,10 +23,9 @@ import java.util.ArrayList;
  * @author LongpingZou
  * @date 2018/6/19
  */
-public class MainView extends View {
-    Paint paint = new Paint();
+public class GameView extends View {
+    private Paint paint = new Paint();
     public MainGame game;
-    public boolean hasSaveState = false;
     public final int numCellTypes = 18;
     public boolean continueButtonEnabled = false;
 
@@ -33,9 +33,18 @@ public class MainView extends View {
     private float textSize = 0;
     private float cellTextSize = 0;
     private int gridWidth = 0;
-    private int TEXT_BLACK;
-    private int TEXT_WHITE;
-    private int TEXT_BROWN;
+    /**
+     * black text color
+     */
+    private int blackTextColor;
+    /**
+     * white text color
+     */
+    private int whiteTextColor;
+    /**
+     * brown text color
+     */
+    private int brownTextColor;
     public int startingX;
     public int startingY;
     public int endingX;
@@ -119,6 +128,7 @@ public class MainView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
+        Log.i("ABC", "onSizeChanged");
         getLayout(width, height);
         createBitmapCells();
         createBackgroundBitmap(width, height);
@@ -133,9 +143,9 @@ public class MainView extends View {
     private void drawCellText(Canvas canvas, int value, int sX, int sY) {
         int textShiftY = centerText();
         if (value >= 8) {
-            paint.setColor(TEXT_WHITE);
+            paint.setColor(whiteTextColor);
         } else {
-            paint.setColor(TEXT_BLACK);
+            paint.setColor(blackTextColor);
         }
         canvas.drawText("" + value, sX + cellSize / 2, sY + cellSize / 2 - textShiftY, paint);
     }
@@ -164,10 +174,10 @@ public class MainView extends View {
         backgroundRectangle.setBounds(sXHighScore, sYAll, eXHighScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
-        paint.setColor(TEXT_BROWN);
+        paint.setColor(brownTextColor);
         canvas.drawText(getResources().getString(R.string.high_score), sXHighScore + textMiddleHighScore, titleStartYAll, paint);
         paint.setTextSize(bodyTextSize);
-        paint.setColor(TEXT_WHITE);
+        paint.setColor(whiteTextColor);
         canvas.drawText(String.valueOf(game.highScore), sXHighScore + textMiddleHighScore, bodyStartYAll, paint);
 
 
@@ -175,79 +185,50 @@ public class MainView extends View {
         backgroundRectangle.setBounds(sXScore, sYAll, eXScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
-        paint.setColor(TEXT_BROWN);
+        paint.setColor(brownTextColor);
         canvas.drawText(getResources().getString(R.string.score), sXScore + textMiddleScore, titleStartYAll, paint);
         paint.setTextSize(bodyTextSize);
-        paint.setColor(TEXT_WHITE);
+        paint.setColor(whiteTextColor);
         canvas.drawText(String.valueOf(game.score), sXScore + textMiddleScore, bodyStartYAll, paint);
     }
 
     private void drawNewGameButton(Canvas canvas, boolean lightUp) {
 
         if (lightUp) {
-            drawDrawable(canvas,
-                    lightUpRectangle,
-                    sXNewGame,
-                    sYIcons,
-                    sXNewGame + iconSize,
-                    sYIcons + iconSize
-            );
+            drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons, sXNewGame + iconSize, sYIcons + iconSize);
         } else {
-            drawDrawable(canvas,
-                    backgroundRectangle,
-                    sXNewGame,
-                    sYIcons, sXNewGame + iconSize,
-                    sYIcons + iconSize
-            );
+            drawDrawable(canvas, backgroundRectangle, sXNewGame, sYIcons, sXNewGame + iconSize, sYIcons + iconSize);
         }
 
-        drawDrawable(canvas,
-                getResources().getDrawable(R.drawable.ic_action_refresh),
-                sXNewGame + iconPaddingSize,
-                sYIcons + iconPaddingSize,
-                sXNewGame + iconSize - iconPaddingSize,
-                sYIcons + iconSize - iconPaddingSize
-        );
+        Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
+        drawDrawable(canvas, refresh, sXNewGame + iconPaddingSize, sYIcons + iconPaddingSize, sXNewGame + iconSize - iconPaddingSize, sYIcons + iconSize - iconPaddingSize);
     }
 
     private void drawUndoButton(Canvas canvas) {
-
-        drawDrawable(canvas,
-                backgroundRectangle,
-                sXUndo,
-                sYIcons, sXUndo + iconSize,
-                sYIcons + iconSize
-        );
-
-        drawDrawable(canvas,
-                getResources().getDrawable(R.drawable.ic_action_undo),
-                sXUndo + iconPaddingSize,
-                sYIcons + iconPaddingSize,
-                sXUndo + iconSize - iconPaddingSize,
-                sYIcons + iconSize - iconPaddingSize
-        );
+        drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo + iconSize, sYIcons + iconSize);
+        drawDrawable(canvas, getResources().getDrawable(R.drawable.ic_action_undo), sXUndo + iconPaddingSize, sYIcons + iconPaddingSize, sXUndo + iconSize - iconPaddingSize, sYIcons + iconSize - iconPaddingSize);
     }
 
     private void drawHeader(Canvas canvas) {
 
         //Drawing the header
         paint.setTextSize(headerTextSize);
-        paint.setColor(TEXT_BLACK);
+        paint.setColor(blackTextColor);
         paint.setTextAlign(Paint.Align.LEFT);
         int textShiftY = centerText() * 2;
         int headerStartY = sYAll - textShiftY;
         canvas.drawText(getResources().getString(R.string.header), startingX, headerStartY, paint);
     }
 
-    private void drawInstructions(Canvas canvas) {
-
-        //Drawing the instructions
-        paint.setTextSize(instructionsTextSize);
-        paint.setTextAlign(Paint.Align.LEFT);
-        int textShiftY = centerText() * 2;
-        canvas.drawText(getResources().getString(R.string.instructions),
-                startingX, endingY - textShiftY + textPaddingSize, paint);
-    }
+//    private void drawInstructions(Canvas canvas) {
+//
+//        //Drawing the instructions
+//        paint.setTextSize(instructionsTextSize);
+//        paint.setTextAlign(Paint.Align.LEFT);
+//        int textShiftY = centerText() * 2;
+//        canvas.drawText(getResources().getString(R.string.instructions),
+//                startingX, endingY - textShiftY + textPaddingSize, paint);
+//    }
 
     private void drawBackground(Canvas canvas) {
         drawDrawable(canvas, backgroundRectangle, startingX, startingY, endingX, endingY);
@@ -377,7 +358,7 @@ public class MainView extends View {
 
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(bodyTextSize);
-        paint.setColor(TEXT_BLACK);
+        paint.setColor(blackTextColor);
         canvas.drawText(getResources().getString(R.string.endless), startingX, sYIcons - centerText() * 2, paint);
     }
 
@@ -390,21 +371,20 @@ public class MainView extends View {
             lightUpRectangle.setAlpha(127);
             drawDrawable(canvas, lightUpRectangle, 0, 0, width, length);
             lightUpRectangle.setAlpha(255);
-            paint.setColor(TEXT_WHITE);
+            paint.setColor(whiteTextColor);
             paint.setAlpha(255);
             paint.setTextSize(gameOverTextSize);
             paint.setTextAlign(Paint.Align.CENTER);
             int textBottom = middleY - centerText();
             canvas.drawText(getResources().getString(R.string.you_win), middleX, textBottom, paint);
             paint.setTextSize(bodyTextSize);
-            String text = showButton ? getResources().getString(R.string.go_on) :
-                    getResources().getString(R.string.for_now);
+            String text = showButton ? getResources().getString(R.string.go_on) : getResources().getString(R.string.for_now);
             canvas.drawText(text, middleX, textBottom + textPaddingSize * 2 - centerText() * 2, paint);
         } else {
             fadeRectangle.setAlpha(127);
             drawDrawable(canvas, fadeRectangle, 0, 0, width, length);
             fadeRectangle.setAlpha(255);
-            paint.setColor(TEXT_BLACK);
+            paint.setColor(blackTextColor);
             paint.setAlpha(255);
             paint.setTextSize(gameOverTextSize);
             paint.setTextAlign(Paint.Align.CENTER);
@@ -420,7 +400,7 @@ public class MainView extends View {
         drawUndoButton(canvas);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
-        drawInstructions(canvas);
+//        drawInstructions(canvas);
 
     }
 
@@ -464,7 +444,6 @@ public class MainView extends View {
 
     private void createOverlays() {
         Resources resources = getResources();
-        //Initalize overlays
         Bitmap bitmap = Bitmap.createBitmap(endingX - startingX, endingY - startingY, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         createEndGameStates(canvas, true, true);
@@ -550,7 +529,7 @@ public class MainView extends View {
         return (int) ((paint.descent() + paint.ascent()) / 2);
     }
 
-    public MainView(Context context) {
+    public GameView(Context context) {
         super(context);
 
         Resources resources = context.getResources();
@@ -562,9 +541,9 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            TEXT_WHITE = resources.getColor(R.color.text_white);
-            TEXT_BLACK = resources.getColor(R.color.text_black);
-            TEXT_BROWN = resources.getColor(R.color.text_brown);
+            whiteTextColor = resources.getColor(R.color.text_white);
+            blackTextColor = resources.getColor(R.color.text_black);
+            brownTextColor = resources.getColor(R.color.text_brown);
             this.setBackgroundColor(resources.getColor(R.color.background));
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "ClearSans-Bold.ttf");
             paint.setTypeface(font);
