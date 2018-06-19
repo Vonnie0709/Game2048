@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="text_white">#f9f6f2</color>
+    <color name="text_black">#776e65</color>
+    <color name="text_brown">#d6cdc4</color>
+    <color name="background">#faf8ef</color>
+
+    <color name="color_bcada1">#bcada1</color>
+    <!-- null -->
+    <color name="color_ccc1b4">#ccc1b4</color>
+    <!-- 2 -->
+    <color name="color_eee4da">#eee4da</color>
+    <!-- 4 -->
+    <color name="color_ede0c8">#eee1c9</color>
+    <!-- 8 -->
+    <color name="color_f2b179">#f2b179</color>
+    <!-- 16 -->
+    <color name="color_f59563">#f59563</color>
+    <!-- 32 -->
+    <color name="color_f67c5f">#f67c5f</color>
+    <!-- 64 -->
+    <color name="color_f65e3b">#f65e3b</color>
+    <!-- 128 -->
+    <color name="color_edcf72">#edcf72</color>
+    <!-- 256 -->
+    <color name="color_edcc61">#edcc61</color>
+    <!-- 512 -->
+    <color name="color_e4c029">#e4c029</color>
+    <!-- 1024 -->
+    <color name="color_e3bb1a">#e3bb1a</color>
+    <!-- 2048 -->
+    <color name="color_edc22e">#edc22e</color>
+    <!-- 4096 -->
+    <color name="color_5fdb93">#5fdb93</color>
+</resources>
