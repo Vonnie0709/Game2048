@@ -112,7 +112,6 @@ public class MainGame {
 
     private void spawnTile(Tile tile) {
         grid.insertTile(tile);
-        //Direction: -1 = EXPANDING
         aGrid.startAnimation(tile.getX(), tile.getY(), SPAWN_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
     }
 
