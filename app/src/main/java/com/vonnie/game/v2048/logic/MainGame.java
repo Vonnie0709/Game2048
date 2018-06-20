@@ -42,19 +42,25 @@ public class MainGame {
     private static final int GAME_ENDLESS_WON = 3;
 
     public Grid grid = null;
-    public AnimGrid aGrid;
+    public AnimGrid animGrid;
     public final int numSquaresX = 4;
     public final int numSquaresY = 4;
     /**
-     * init start cell count
+     * Init start cell count
      */
     private final int startTiles = 2;
 
+    /**
+     * Game state ,such as win,normal,lose and so on
+     */
     public int gameState = 0;
     public boolean canUndo;
 
-    public long score = 0;
-    public long highScore = 0;
+    /**
+     * Current score
+     */
+    public long currentScore = 0;
+    public long historyHighScore = 0;
 
     public long lastScore = 0;
     public int lastGameState = 0;
@@ -69,7 +75,7 @@ public class MainGame {
     public MainGame(Context context, GameView view) {
         mContext = context;
         mView = view;
-//        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
+///        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
         endingMaxValue = Long.MAX_VALUE;
         Log.i("ABC", "endingMaxValue:" + endingMaxValue);
     }
@@ -82,13 +88,13 @@ public class MainGame {
             saveUndoState();
             grid.clearGrid();
         }
-        aGrid = new AnimGrid(numSquaresX, numSquaresY);
-        highScore = getHighScore();
-        if (score >= highScore) {
-            highScore = score;
+        animGrid = new AnimGrid(numSquaresX, numSquaresY);
+        historyHighScore = getHistoryHighScore();
+        if (currentScore >= historyHighScore) {
+            historyHighScore = currentScore;
             recordHighScore();
         }
-        score = 0;
+        currentScore = 0;
         gameState = GAME_NORMAL;
         addStartTiles();
         mView.refreshLastTime = true;
@@ -112,14 +118,14 @@ public class MainGame {
 
     private void spawnTile(Tile tile) {
         grid.insertTile(tile);
-        aGrid.startAnimation(tile.getX(), tile.getY(), SPAWN_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
+        animGrid.startAnimation(tile.getX(), tile.getY(), SPAWN_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
     }
 
     private void recordHighScore() {
-        SharedPreferenceUtil.put(mContext, SpConstant.HIGH_SCORE, highScore);
+        SharedPreferenceUtil.put(mContext, SpConstant.HIGH_SCORE, historyHighScore);
     }
 
-    private long getHighScore() {
+    private long getHistoryHighScore() {
         return (long) SharedPreferenceUtil.get(mContext, SpConstant.HIGH_SCORE, -1L);
     }
 
@@ -148,16 +154,16 @@ public class MainGame {
 
     private void prepareUndoState() {
         grid.prepareSaveTiles();
-        bufferScore = score;
+        bufferScore = currentScore;
         bufferGameState = gameState;
     }
 
     public void revertUndoState() {
         if (canUndo) {
             canUndo = false;
-            aGrid.cancelAnimations();
+            animGrid.cancelAnimations();
             grid.revertTiles();
-            score = lastScore;
+            currentScore = lastScore;
             gameState = lastGameState;
             mView.refreshLastTime = true;
             mView.invalidate();
@@ -177,7 +183,7 @@ public class MainGame {
     }
 
     public void move(int direction) {
-        aGrid.cancelAnimations();
+        animGrid.cancelAnimations();
         // 0: up, 1: right, 2: down, 3: left
         if (!isActive()) {
             return;
@@ -212,12 +218,12 @@ public class MainGame {
 
                         int[] extras = {xx, yy};
                         //Direction: 0 = MOVING MERGED
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MERGE_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
+                        animGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
+                        animGrid.startAnimation(merged.getX(), merged.getY(), MERGE_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
 
-                        // Update the score
-                        score = score + merged.getValue();
-                        highScore = Math.max(score, highScore);
+                        // Update the currentScore
+                        currentScore = currentScore + merged.getValue();
+                        historyHighScore = Math.max(currentScore, historyHighScore);
 
                         // The mighty 2048 tile
                         if (merged.getValue() >= winValue() && !gameWon()) {
@@ -229,7 +235,7 @@ public class MainGame {
                         moveTile(tile, positions[0]);
                         int[] extras = {xx, yy, 0};
                         //Direction: 1 = MOVING NO MERGE
-                        aGrid.startAnimation(positions[0].getX(), positions[0].getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
+                        animGrid.startAnimation(positions[0].getX(), positions[0].getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
                     }
 
                     if (!positionsEqual(cell, tile)) {
@@ -256,9 +262,9 @@ public class MainGame {
     }
 
     private void endGame() {
-        aGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
-        if (score >= highScore) {
-            highScore = score;
+        animGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
+        if (currentScore >= historyHighScore) {
+            historyHighScore = currentScore;
             recordHighScore();
         }
     }

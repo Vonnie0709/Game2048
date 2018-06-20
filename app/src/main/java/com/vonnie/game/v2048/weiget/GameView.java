@@ -24,14 +24,29 @@ import java.util.ArrayList;
  * @date 2018/6/19
  */
 public class GameView extends View {
+    /**
+     * paint
+     */
     private Paint paint = new Paint();
+    /**
+     * game object
+     */
     public MainGame game;
     public final int numCellTypes = 18;
     public boolean continueButtonEnabled = false;
 
+    /**
+     * width and height of cell
+     */
     private int cellSize = 0;
     private float textSize = 0;
+    /**
+     * text size of cell
+     */
     private float cellTextSize = 0;
+    /**
+     * width of grid spacing
+     */
     private int gridWidth = 0;
     /**
      * black text color
@@ -45,10 +60,33 @@ public class GameView extends View {
      * brown text color
      */
     private int brownTextColor;
-    public int startingX;
-    public int startingY;
-    public int endingX;
-    public int endingY;
+    /**
+     * The origin of the X axis of a grid table
+     */
+    public int tableOriginalX;
+
+    /**
+     * The origin of the Y axis of a grid table
+     */
+    public int tableOriginalY;
+    /**
+     * The end of the X axis of a grid table
+     */
+    public int tableEndingX;
+    /**
+     * The end of the Y axis of a grid table
+     */
+    public int tableEndingY;
+    /**
+     * The origin of the y axis of info panel
+     */
+    private int panelOriginalY = 10;
+    /**
+     * The origin of the Y axis of title text
+     */
+    private int titleTextOriginY;
+    private int bodyStartYAll;
+    private int eYAll;
     private int textPaddingSize;
     private int iconPaddingSize;
 
@@ -62,24 +100,30 @@ public class GameView extends View {
     private BitmapDrawable winGameContinueOverlay;
     private BitmapDrawable winGameFinalOverlay;
 
-    private int sYAll;
-    private int titleStartYAll;
-    private int bodyStartYAll;
-    private int eYAll;
+
     private int titleWidthHighScore;
     private int titleWidthScore;
 
     public int sYIcons;
     public int sXNewGame;
     public int sXUndo;
+    /**
+     * refresh button and undo button size
+     */
     public int iconSize;
 
     long lastFPSTime = System.nanoTime();
     long currentTime = System.nanoTime();
 
+    /**
+     * text size of title,such as 'currentScore & high currentScore'
+     */
     float titleTextSize;
     float bodyTextSize;
     float headerTextSize;
+    /**
+     * text size of introduce
+     */
     float instructionsTextSize;
     float gameOverTextSize;
 
@@ -100,7 +144,7 @@ public class GameView extends View {
 
         drawScoreText(canvas);
 
-        if (!game.isActive() && !game.aGrid.isAnimationActive()) {
+        if (!game.isActive() && !game.animGrid.isAnimationActive()) {
             drawNewGameButton(canvas, true);
         }
 
@@ -115,8 +159,8 @@ public class GameView extends View {
         }
 
         //Refresh the screen if there is still an animation running
-        if (game.aGrid.isAnimationActive()) {
-            invalidate(startingX, startingY, endingX, endingY);
+        if (game.animGrid.isAnimationActive()) {
+            invalidate(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
             tick();
             //Refresh one last time on game end.
         } else if (!game.isActive() && refreshLastTime) {
@@ -154,12 +198,12 @@ public class GameView extends View {
     }
 
     private void drawScoreText(Canvas canvas) {
-        //Drawing the score text: Ver 2
+        //Drawing the currentScore text: Ver 2
         paint.setTextSize(bodyTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
 
-        int bodyWidthHighScore = (int) (paint.measureText("" + game.highScore));
-        int bodyWidthScore = (int) (paint.measureText("" + game.score));
+        int bodyWidthHighScore = (int) (paint.measureText("" + game.historyHighScore));
+        int bodyWidthScore = (int) (paint.measureText("" + game.currentScore));
 
         int textWidthHighScore = Math.max(titleWidthHighScore, bodyWidthHighScore) + textPaddingSize * 2;
         int textWidthScore = Math.max(titleWidthScore, bodyWidthScore) + textPaddingSize * 2;
@@ -167,32 +211,32 @@ public class GameView extends View {
         int textMiddleHighScore = textWidthHighScore / 2;
         int textMiddleScore = textWidthScore / 2;
 
-        int eXHighScore = endingX;
+        int eXHighScore = tableEndingX;
         int sXHighScore = eXHighScore - textWidthHighScore;
 
         int eXScore = sXHighScore - textPaddingSize;
         int sXScore = eXScore - textWidthScore;
 
         //Outputting high-scores box
-        backgroundRectangle.setBounds(sXHighScore, sYAll, eXHighScore, eYAll);
+        backgroundRectangle.setBounds(sXHighScore, panelOriginalY, eXHighScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
         paint.setColor(brownTextColor);
-        canvas.drawText(getResources().getString(R.string.high_score), sXHighScore + textMiddleHighScore, titleStartYAll, paint);
+        canvas.drawText(getResources().getString(R.string.high_score), sXHighScore + textMiddleHighScore, titleTextOriginY, paint);
         paint.setTextSize(bodyTextSize);
         paint.setColor(whiteTextColor);
-        canvas.drawText(String.valueOf(game.highScore), sXHighScore + textMiddleHighScore, bodyStartYAll, paint);
+        canvas.drawText(String.valueOf(game.historyHighScore), sXHighScore + textMiddleHighScore, bodyStartYAll, paint);
 
 
         //Outputting scores box
-        backgroundRectangle.setBounds(sXScore, sYAll, eXScore, eYAll);
+        backgroundRectangle.setBounds(sXScore, panelOriginalY, eXScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
         paint.setColor(brownTextColor);
-        canvas.drawText(getResources().getString(R.string.score), sXScore + textMiddleScore, titleStartYAll, paint);
+        canvas.drawText(getResources().getString(R.string.score), sXScore + textMiddleScore, titleTextOriginY, paint);
         paint.setTextSize(bodyTextSize);
         paint.setColor(whiteTextColor);
-        canvas.drawText(String.valueOf(game.score), sXScore + textMiddleScore, bodyStartYAll, paint);
+        canvas.drawText(String.valueOf(game.currentScore), sXScore + textMiddleScore, bodyStartYAll, paint);
     }
 
     private void drawNewGameButton(Canvas canvas, boolean lightUp) {
@@ -219,8 +263,8 @@ public class GameView extends View {
         paint.setColor(blackTextColor);
         paint.setTextAlign(Paint.Align.LEFT);
         int textShiftY = centerText() * 2;
-        int headerStartY = sYAll - textShiftY;
-        canvas.drawText(getResources().getString(R.string.header), startingX, headerStartY, paint);
+        int headerStartY = panelOriginalY - textShiftY;
+        canvas.drawText(getResources().getString(R.string.header), tableOriginalX, headerStartY, paint);
     }
 
 //    private void drawInstructions(Canvas canvas) {
@@ -230,11 +274,11 @@ public class GameView extends View {
 //        paint.setTextAlign(Paint.Align.LEFT);
 //        int textShiftY = centerText() * 2;
 //        canvas.drawText(getResources().getString(R.string.instructions),
-//                startingX, endingY - textShiftY + textPaddingSize, paint);
+//                tableOriginalX, tableEndingY - textShiftY + textPaddingSize, paint);
 //    }
 
     private void drawBackground(Canvas canvas) {
-        drawDrawable(canvas, backgroundRectangle, startingX, startingY, endingX, endingY);
+        drawDrawable(canvas, backgroundRectangle, tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
     }
 
     //Renders the set of 16 background squares.
@@ -244,9 +288,9 @@ public class GameView extends View {
         // Outputting the game grid
         for (int xx = 0; xx < game.numSquaresX; xx++) {
             for (int yy = 0; yy < game.numSquaresY; yy++) {
-                int sX = startingX + gridWidth + (cellSize + gridWidth) * xx;
+                int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
-                int sY = startingY + gridWidth + (cellSize + gridWidth) * yy;
+                int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
                 int eY = sY + cellSize;
 
                 drawDrawable(canvas, backgroundCell, sX, sY, eX, eY);
@@ -260,9 +304,9 @@ public class GameView extends View {
         // Outputting the individual cells
         for (int xx = 0; xx < game.numSquaresX; xx++) {
             for (int yy = 0; yy < game.numSquaresY; yy++) {
-                int sX = startingX + gridWidth + (cellSize + gridWidth) * xx;
+                int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
-                int sY = startingY + gridWidth + (cellSize + gridWidth) * yy;
+                int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
                 int eY = sY + cellSize;
 
                 Tile currentTile = game.grid.getCellContent(xx, yy);
@@ -272,7 +316,7 @@ public class GameView extends View {
                     int index = log2(value);
 
                     //Check for any active animations
-                    ArrayList<AnimCell> aArray = game.aGrid.getAnimCell(xx, yy);
+                    ArrayList<AnimCell> aArray = game.animGrid.getAnimCell(xx, yy);
                     boolean animated = false;
                     for (int i = aArray.size() - 1; i >= 0; i--) {
                         AnimCell aCell = aArray.get(i);
@@ -333,7 +377,7 @@ public class GameView extends View {
     private void drawEndGameState(Canvas canvas) {
         double alphaChange = 1;
         continueButtonEnabled = false;
-        for (AnimCell animation : game.aGrid.globalAnimation) {
+        for (AnimCell animation : game.animGrid.globalAnimation) {
             if (animation.getAnimationType() == MainGame.FADE_GLOBAL_ANIMATION) {
                 alphaChange = animation.getPercentageDone();
             }
@@ -351,7 +395,7 @@ public class GameView extends View {
         }
 
         if (displayOverlay != null) {
-            displayOverlay.setBounds(startingX, startingY, endingX, endingY);
+            displayOverlay.setBounds(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
             displayOverlay.setAlpha((int) (255 * alphaChange));
             displayOverlay.draw(canvas);
         }
@@ -362,12 +406,12 @@ public class GameView extends View {
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(bodyTextSize);
         paint.setColor(blackTextColor);
-        canvas.drawText(getResources().getString(R.string.endless), startingX, sYIcons - centerText() * 2, paint);
+        canvas.drawText(getResources().getString(R.string.endless), tableOriginalX, sYIcons - centerText() * 2, paint);
     }
 
     private void createEndGameStates(Canvas canvas, boolean win, boolean showButton) {
-        int width = endingX - startingX;
-        int length = endingY - startingY;
+        int width = tableEndingX - tableOriginalX;
+        int length = tableEndingY - tableOriginalY;
         int middleX = width / 2;
         int middleY = length / 2;
         if (win) {
@@ -445,15 +489,15 @@ public class GameView extends View {
 
     private void createOverlays() {
         Resources resources = getResources();
-        Bitmap bitmap = Bitmap.createBitmap(endingX - startingX, endingY - startingY, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         createEndGameStates(canvas, true, true);
         winGameContinueOverlay = new BitmapDrawable(resources, bitmap);
-        bitmap = Bitmap.createBitmap(endingX - startingX, endingY - startingY, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         createEndGameStates(canvas, true, false);
         winGameFinalOverlay = new BitmapDrawable(resources, bitmap);
-        bitmap = Bitmap.createBitmap(endingX - startingX, endingY - startingY, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         createEndGameStates(canvas, false, false);
         loseGameOverlay = new BitmapDrawable(resources, bitmap);
@@ -461,7 +505,7 @@ public class GameView extends View {
 
     private void tick() {
         currentTime = System.nanoTime();
-        game.aGrid.tickAll(currentTime - lastFPSTime);
+        game.animGrid.tickAll(currentTime - lastFPSTime);
         lastFPSTime = currentTime;
     }
 
@@ -477,17 +521,24 @@ public class GameView extends View {
     }
 
     private void getLayout(int width, int height) {
+        //considering rotating screen ,numSquresY need to add 3 points
         cellSize = Math.min(width / (game.numSquaresX + 1), height / (game.numSquaresY + 3));
-        gridWidth = cellSize / 7;
+        Log.i("ABC", "width / (game.numSquaresX):" + width / (game.numSquaresX) + " - " + height / (game.numSquaresY));
+        Log.i("ABC", "cellSize:" + cellSize + " width:" + width + " height:" + height);
+        gridWidth = cellSize / (game.numSquaresX + 3);
+        Log.i("ABC", "gridWidth:" + gridWidth);
         int screenMiddleX = width / 2;
         int screenMiddleY = height / 2;
         int boardMiddleX = screenMiddleX;
         int boardMiddleY = screenMiddleY + cellSize / 2;
-        iconSize = cellSize / 2;
+        Log.i("ABC", "boardMiddleX:" + boardMiddleX + "-boardMiddleY:" + boardMiddleY);
+        iconSize = Math.min(width / 4, height / 4) / 2;
+//        iconSize = cellSize / 2;
 
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(cellSize);
-        textSize = cellSize * cellSize / Math.max(cellSize, paint.measureText("0000"));
+        textSize = cellSize * cellSize / Math.max(cellSize, paint.measureText("000000"));
+        Log.i("ABC", "2 * cellSize:" + (2 * cellSize) + " - " + "paint.measureText(\"000000\"):" + paint.measureText("000000"));
         cellTextSize = textSize;
         titleTextSize = textSize / 3;
         bodyTextSize = (int) (textSize / 1.5);
@@ -497,31 +548,33 @@ public class GameView extends View {
         textPaddingSize = (int) (textSize / 3);
         iconPaddingSize = (int) (textSize / 5);
 
-        //Grid Dimensions
         double halfNumSquaresX = game.numSquaresX / 2d;
         double halfNumSquaresY = game.numSquaresY / 2d;
 
-        startingX = (int) (boardMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
-        endingX = (int) (boardMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
-        startingY = (int) (boardMiddleY - (cellSize + gridWidth) * halfNumSquaresY - gridWidth / 2);
-        endingY = (int) (boardMiddleY + (cellSize + gridWidth) * halfNumSquaresY + gridWidth / 2);
+        tableOriginalX = (int) (boardMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
+        tableEndingX = (int) (boardMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
+        tableOriginalY = (int) (boardMiddleY - (cellSize + gridWidth) * halfNumSquaresY - gridWidth / 2);
+        tableEndingY = (int) (boardMiddleY + (cellSize + gridWidth) * halfNumSquaresY + gridWidth / 2);
 
         paint.setTextSize(titleTextSize);
 
         int textShiftYAll = centerText();
-        //static variables
-        sYAll = (int) (startingY - cellSize * 1.5);
-        titleStartYAll = (int) (sYAll + textPaddingSize + titleTextSize / 2 - textShiftYAll);
-        bodyStartYAll = (int) (titleStartYAll + textPaddingSize + titleTextSize / 2 + bodyTextSize / 2);
 
+////        panelOriginalY = (int) (tableOriginalY - cellSize * 1.5);
+//        Log.i("ABC", "tableOriginalY:" + tableOriginalY + " sYALL:" + panelOriginalY);
+////        panelOriginalY=0;
+
+        titleTextOriginY = (int) (panelOriginalY + textPaddingSize + titleTextSize / 2 - textShiftYAll);
+        bodyStartYAll = (int) (titleTextOriginY + textPaddingSize + titleTextSize / 2 + bodyTextSize / 2);
+        Log.i("ABC", "textShiftYAll:" + textShiftYAll + " -titleTextOriginY:" + titleTextOriginY);
         titleWidthHighScore = (int) (paint.measureText(getResources().getString(R.string.high_score)));
         titleWidthScore = (int) (paint.measureText(getResources().getString(R.string.score)));
         paint.setTextSize(bodyTextSize);
-        textShiftYAll = centerText();
+//        textShiftYAll = centerText();
         eYAll = (int) (bodyStartYAll + textShiftYAll + bodyTextSize / 2 + textPaddingSize);
 
-        sYIcons = (startingY + eYAll) / 2 - iconSize / 2;
-        sXNewGame = (endingX - iconSize);
+        sYIcons = (tableOriginalY + eYAll) / 2 - iconSize / 2;
+        sXNewGame = (tableEndingX - iconSize);
         sXUndo = sXNewGame - iconSize * 3 / 2 - iconPaddingSize;
         resyncTime();
     }

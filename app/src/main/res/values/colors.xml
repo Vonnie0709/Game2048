@@ -7,6 +7,9 @@
     <color name="text_black">#776e65</color>
     <color name="text_brown">#d6cdc4</color>
     <color name="background">#faf8ef</color>
+    <color name="color_edc613">#edc613</color>
+    <color name="color_ed995b">#ed995b</color>
+    <color name="color_bbada0">#bbada0</color>
 
     <color name="color_bcada1">#bcada1</color>
     <!-- null -->
@@ -35,4 +38,6 @@
     <color name="color_edc22e">#edc22e</color>
     <!-- 4096 -->
     <color name="color_5fdb93">#5fdb93</color>
+    <color name="color_FFF63B3B">#FFF63B3B</color>
+    <color name="color_FFF63BEA">#FFF63BEA</color>
 </resources>

@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        SharedPreferenceUtil.put(this, SpConstant.SCORE, view.game.score);
-        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_TEMP, view.game.highScore);
+        SharedPreferenceUtil.put(this, SpConstant.SCORE, view.game.currentScore);
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_TEMP, view.game.historyHighScore);
         SharedPreferenceUtil.put(this, SpConstant.UNDO_SCORE, view.game.lastScore);
         SharedPreferenceUtil.put(this, SpConstant.CAN_UNDO, view.game.canUndo);
         SharedPreferenceUtil.put(this, SpConstant.GAME_STATE, view.game.gameState);
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void load() {
         //Stopping all animations
-        view.game.aGrid.cancelAnimations();
+        view.game.animGrid.cancelAnimations();
 
         for (int xx = 0; xx < view.game.grid.field.length; xx++) {
             for (int yy = 0; yy < view.game.grid.field[0].length; yy++) {
@@ -132,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        view.game.score = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, view.game.score);
-        view.game.highScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, view.game.highScore);
+        view.game.currentScore = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, view.game.currentScore);
+        view.game.historyHighScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, view.game.historyHighScore);
         view.game.lastScore = (long) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, view.game.lastScore);
         view.game.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, view.game.canUndo);
         view.game.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, view.game.gameState);
