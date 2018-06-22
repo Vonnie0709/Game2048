@@ -98,9 +98,11 @@ public class GameView extends View {
     private int bodyStartYAll;
     private int eYAll;
     private int textPaddingSize;
-    private int iconPaddingSize;
 
-    private Drawable backgroundRectangle;
+    /**
+     * padding between icon and background of function ,such as new game and undo
+     */
+    private int iconPaddingSize;
 
     /**
      * background drawable of score
@@ -112,9 +114,19 @@ public class GameView extends View {
     private Drawable modePanelBg;
 
     /**
-     * background drawable of function panel ,such as menu ,ranking
+     * background drawable of menu panel
+     */
+    private Drawable menuPanelBg;
+
+    /**
+     * background drawable of function panel,such as undo and new game
      */
     private Drawable functionPanelBg;
+
+    /**
+     * width and height of score panel
+     */
+    private int panelWidth;
     private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
 
     private Drawable lightUpRectangle;
@@ -178,8 +190,9 @@ public class GameView extends View {
 
         canvas.drawBitmap(background, 0, 0, paint);
 
-        drawScoreText(canvas);
-        drawFunctionPanel(canvas);
+//        drawScoreText(canvas);
+        drawMenuPanel(canvas);
+        drawScorePanel(canvas);
         if (!game.isActive() && !game.animGrid.isAnimationActive()) {
             drawNewGameButton(canvas, true);
         }
@@ -239,15 +252,93 @@ public class GameView extends View {
      *
      * @param canvas
      */
-    private void drawFunctionPanel(Canvas canvas) {
-        int panelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 3 * tableOriginalX) / 2;
+    private void drawMenuPanel(Canvas canvas) {
         int menuStartX = tableOriginalX * 2 + modePanelWidth;
         int menuEndX = tableOriginalX * 2 + modePanelWidth + panelWidth;
         int menuTop = infoPanelOriginalY + panelWidth * 7 / 10;
         int menuBottom = infoPanelOriginalY + modePanelWidth;
-        functionPanelBg.setBounds(menuStartX, menuTop, menuEndX, menuBottom);
-        functionPanelBg.draw(canvas);
+        menuPanelBg.setBounds(menuStartX, menuTop, menuEndX, menuBottom);
+        menuPanelBg.draw(canvas);
     }
+
+
+    /**
+     * draw the high score panel
+     *
+     * @param canvas
+     */
+    private void drawScorePanel(Canvas canvas) {
+        int scorePanelStartX = tableOriginalX * 2 + modePanelWidth;
+        int scorePanelEndX = tableOriginalX * 2 + modePanelWidth + panelWidth;
+        int scorePanelTop = infoPanelOriginalY;
+        int scorePanelBottom = infoPanelOriginalY + panelWidth * 6 / 10;
+        scorePanelBg.setBounds(scorePanelStartX, scorePanelTop, scorePanelEndX, scorePanelBottom);
+        scorePanelBg.draw(canvas);
+
+
+        int highScorePanelStartX = 3 * tableOriginalX + modePanelWidth + panelWidth;
+        int highScorePanelEndX = tableEndingX;
+        int highScorePanelTop = infoPanelOriginalY;
+        int highScorePanelBottom = infoPanelOriginalY + panelWidth * 6 / 10;
+        scorePanelBg.setBounds(highScorePanelStartX, highScorePanelTop, highScorePanelEndX, highScorePanelBottom);
+        scorePanelBg.draw(canvas);
+    }
+
+
+    /**
+     * draw undo game button
+     *
+     * @param canvas
+     */
+    private void drawUndoButton(Canvas canvas) {
+        int functionButtonWidth = panelWidth / 2 - tableOriginalX;
+        int functionButtonStartX = 3 * tableOriginalX + modePanelWidth + panelWidth;
+        int functionButtonEndX = functionButtonStartX + functionButtonWidth;
+        int functionButtonTop = infoPanelOriginalY + panelWidth * 7 / 10;
+        int functionButtonBottom = infoPanelOriginalY + modePanelWidth;
+        lightUpRectangle.setBounds(functionButtonStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+        lightUpRectangle.draw(canvas);
+        Drawable undo = getResources().getDrawable(R.drawable.ic_action_undo);
+        undo.setBounds(functionButtonStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
+        undo.draw(canvas);
+    }
+
+    /**
+     * draw new game button
+     *
+     * @param canvas
+     * @param enable
+     */
+    private void drawNewGameButton(Canvas canvas, boolean enable) {
+        int functionButtonWidth = panelWidth / 2 - tableOriginalX;
+        int functionButtonStartX = tableEndingX - functionButtonWidth;
+        int functionButtonEndX = tableEndingX;
+        int functionButtonTop = infoPanelOriginalY + panelWidth * 7 / 10;
+        int functionButtonBottom = infoPanelOriginalY + modePanelWidth;
+        if (enable) {
+            lightUpRectangle.setBounds(functionButtonStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            lightUpRectangle.draw(canvas);
+        } else {
+            lightUpRectangle.setBounds(functionButtonStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            lightUpRectangle.draw(canvas);
+        }
+        Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
+        refresh.setBounds(functionButtonStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
+        refresh.draw(canvas);
+//        if (enable) {
+//            drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
+//        } else {
+//            drawDrawable(canvas, backgroundRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
+//        }
+//
+//        Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
+//        drawDrawable(canvas, refresh, sXNewGame + iconPaddingSize, sYIcons + iconPaddingSize, sXNewGame + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
+    }
+
+//    private void drawUndoButton(Canvas canvas) {
+//        drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo + functionButtonSize, sYIcons + functionButtonSize);
+//        drawDrawable(canvas, getResources().getDrawable(R.drawable.ic_action_undo), sXUndo + iconPaddingSize, sYIcons + iconPaddingSize, sXUndo + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
+//    }
 
     private void drawScoreText(Canvas canvas) {
 
@@ -298,22 +389,6 @@ public class GameView extends View {
         canvas.drawText(String.valueOf(game.currentScore), sXScore + textMiddleScore, bodyStartYAll, paint);
     }
 
-    private void drawNewGameButton(Canvas canvas, boolean lightUp) {
-
-        if (lightUp) {
-            drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
-        } else {
-            drawDrawable(canvas, backgroundRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
-        }
-
-        Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
-        drawDrawable(canvas, refresh, sXNewGame + iconPaddingSize, sYIcons + iconPaddingSize, sXNewGame + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
-    }
-
-    private void drawUndoButton(Canvas canvas) {
-        drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo + functionButtonSize, sYIcons + functionButtonSize);
-        drawDrawable(canvas, getResources().getDrawable(R.drawable.ic_action_undo), sXUndo + iconPaddingSize, sYIcons + iconPaddingSize, sXUndo + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
-    }
 
     private void drawHeader(Canvas canvas) {
 
@@ -357,6 +432,7 @@ public class GameView extends View {
 //    }
 
     private void drawBackground(Canvas canvas) {
+        Drawable backgroundRectangle = getResources().getDrawable(R.drawable.background_rectangle);
         drawDrawable(canvas, backgroundRectangle, tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
     }
 
@@ -520,6 +596,7 @@ public class GameView extends View {
         drawHeader(canvas);
         drawNewGameButton(canvas, false);
         drawUndoButton(canvas);
+//        drawUndoButton(canvas);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
 //        drawInstructions(canvas);
@@ -656,6 +733,9 @@ public class GameView extends View {
         sYIcons = (tableOriginalY + eYAll) / 2 - functionButtonSize / 2;
         sXNewGame = (tableEndingX - functionButtonSize);
         sXUndo = sXNewGame - functionButtonSize * 3 / 2 - iconPaddingSize;
+
+
+        panelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 3 * tableOriginalX) / 2;
         resyncTime();
 
     }
@@ -674,9 +754,10 @@ public class GameView extends View {
 
             //Getting assets
             functionPanelBg = resources.getDrawable(R.drawable.function_background_rectangle);
+            menuPanelBg = resources.getDrawable(R.drawable.menu_background_rectangle);
             scorePanelBg = resources.getDrawable(R.drawable.score_background_rectangle);
             modePanelBg = resources.getDrawable(R.drawable.mode_background_rectangle);
-            backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
+
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
             whiteTextColor = resources.getColor(R.color.text_white);
