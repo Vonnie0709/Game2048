@@ -97,6 +97,7 @@ public class MainGame {
         currentScore = 0;
         gameState = GAME_NORMAL;
         addStartTiles();
+        canUndo = false;
         mView.refreshLastTime = true;
         mView.resyncTime();
         mView.invalidate();

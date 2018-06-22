@@ -119,13 +119,12 @@ public class OperationListener implements View.OnTouchListener {
                 veryLastDirection = 1;
                 //"Menu" inputs
                 if (!hasMoved) {
-                    if (iconPressed(mView.sXNewGame, mView.sYIcons)) {
+                    if (iconPressed(mView.newGameFuntionStartX, mView.functionButtonTop)) {
                         mView.game.newGame();
-                    } else if (iconPressed(mView.sXUndo, mView.sYIcons)) {
+                    } else if (iconPressed(mView.undoFunctionStartX, mView.functionButtonTop)) {
                         mView.game.revertUndoState();
                     } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
                         mView.game.setEndlessMode();
-                        Log.i("ABC", "hah");
                     }
                 }
             default:
@@ -139,8 +138,7 @@ public class OperationListener implements View.OnTouchListener {
     }
 
     private boolean iconPressed(int sx, int sy) {
-        return isTap(1) && inRange(sx, x, sx + mView.functionButtonSize)
-                && inRange(sy, y, sy + mView.functionButtonSize);
+        return isTap(1) && inRange(sx, x, sx + mView.functionButtonWidth) && inRange(sy, y, sy + mView.functionButtonWidth);
     }
 
     private boolean inRange(float starting, float check, float ending) {
@@ -148,6 +146,6 @@ public class OperationListener implements View.OnTouchListener {
     }
 
     private boolean isTap(int factor) {
-        return pathMoved() <= mView.functionButtonSize * factor;
+        return pathMoved() <= mView.functionButtonWidth * factor;
     }
 }
