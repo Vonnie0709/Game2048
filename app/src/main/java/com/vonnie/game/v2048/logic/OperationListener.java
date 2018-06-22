@@ -139,8 +139,8 @@ public class OperationListener implements View.OnTouchListener {
     }
 
     private boolean iconPressed(int sx, int sy) {
-        return isTap(1) && inRange(sx, x, sx + mView.iconSize)
-                && inRange(sy, y, sy + mView.iconSize);
+        return isTap(1) && inRange(sx, x, sx + mView.functionButtonSize)
+                && inRange(sy, y, sy + mView.functionButtonSize);
     }
 
     private boolean inRange(float starting, float check, float ending) {
@@ -148,6 +148,6 @@ public class OperationListener implements View.OnTouchListener {
     }
 
     private boolean isTap(int factor) {
-        return pathMoved() <= mView.iconSize * factor;
+        return pathMoved() <= mView.functionButtonSize * factor;
     }
 }

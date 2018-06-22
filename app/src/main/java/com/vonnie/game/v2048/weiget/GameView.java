@@ -44,6 +44,7 @@ public class GameView extends View {
      * text size of cell
      */
     private float cellTextSize = 0;
+
     /**
      * width of grid spacing
      */
@@ -80,7 +81,12 @@ public class GameView extends View {
     /**
      * The origin of the y axis of info panel
      */
-    private int panelOriginalY = 10;
+    private int infoPanelOriginalY;
+
+    /**
+     * The origin of the x axis of info panel
+     */
+    private int infoPanelOriginalX;
     /**
      * The origin of the Y axis of title text
      */
@@ -91,6 +97,7 @@ public class GameView extends View {
     private int iconPaddingSize;
 
     private Drawable backgroundRectangle;
+    private Drawable modeRectangleBg;
     private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
 
     private Drawable lightUpRectangle;
@@ -105,27 +112,43 @@ public class GameView extends View {
     private int titleWidthScore;
 
     public int sYIcons;
+    /**
+     * the start x of new game button
+     */
     public int sXNewGame;
+
+    /**
+     * the start x of undo button
+     */
     public int sXUndo;
     /**
      * refresh button and undo button size
      */
-    public int iconSize;
+    public int functionButtonSize;
 
+
+    /**
+     * mode tips button size
+     */
+    public int modeButtonSize;
     long lastFPSTime = System.nanoTime();
     long currentTime = System.nanoTime();
 
     /**
      * text size of title,such as 'currentScore & high currentScore'
      */
-    float titleTextSize;
-    float bodyTextSize;
-    float headerTextSize;
+    private float titleTextSize;
+    private float bodyTextSize;
+
+    /**
+     * text size of header 2048
+     */
+    private float headerTextSize;
     /**
      * text size of introduce
      */
-    float instructionsTextSize;
-    float gameOverTextSize;
+    private float instructionsTextSize;
+    private float gameOverTextSize;
 
     public boolean refreshLastTime = true;
 
@@ -218,7 +241,7 @@ public class GameView extends View {
         int sXScore = eXScore - textWidthScore;
 
         //Outputting high-scores box
-        backgroundRectangle.setBounds(sXHighScore, panelOriginalY, eXHighScore, eYAll);
+        backgroundRectangle.setBounds(sXHighScore, infoPanelOriginalY, eXHighScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
         paint.setColor(brownTextColor);
@@ -229,7 +252,7 @@ public class GameView extends View {
 
 
         //Outputting scores box
-        backgroundRectangle.setBounds(sXScore, panelOriginalY, eXScore, eYAll);
+        backgroundRectangle.setBounds(sXScore, infoPanelOriginalY, eXScore, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
         paint.setColor(brownTextColor);
@@ -242,29 +265,47 @@ public class GameView extends View {
     private void drawNewGameButton(Canvas canvas, boolean lightUp) {
 
         if (lightUp) {
-            drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons, sXNewGame + iconSize, sYIcons + iconSize);
+            drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
         } else {
-            drawDrawable(canvas, backgroundRectangle, sXNewGame, sYIcons, sXNewGame + iconSize, sYIcons + iconSize);
+            drawDrawable(canvas, backgroundRectangle, sXNewGame, sYIcons, sXNewGame + functionButtonSize, sYIcons + functionButtonSize);
         }
 
         Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
-        drawDrawable(canvas, refresh, sXNewGame + iconPaddingSize, sYIcons + iconPaddingSize, sXNewGame + iconSize - iconPaddingSize, sYIcons + iconSize - iconPaddingSize);
+        drawDrawable(canvas, refresh, sXNewGame + iconPaddingSize, sYIcons + iconPaddingSize, sXNewGame + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
     }
 
     private void drawUndoButton(Canvas canvas) {
-        drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo + iconSize, sYIcons + iconSize);
-        drawDrawable(canvas, getResources().getDrawable(R.drawable.ic_action_undo), sXUndo + iconPaddingSize, sYIcons + iconPaddingSize, sXUndo + iconSize - iconPaddingSize, sYIcons + iconSize - iconPaddingSize);
+        drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo + functionButtonSize, sYIcons + functionButtonSize);
+        drawDrawable(canvas, getResources().getDrawable(R.drawable.ic_action_undo), sXUndo + iconPaddingSize, sYIcons + iconPaddingSize, sXUndo + functionButtonSize - iconPaddingSize, sYIcons + functionButtonSize - iconPaddingSize);
     }
 
     private void drawHeader(Canvas canvas) {
 
-        //Drawing the header
+        drawDrawable(canvas, modeRectangleBg, infoPanelOriginalX, infoPanelOriginalY, infoPanelOriginalX + (cellSize - gridWidth) * 2, infoPanelOriginalY + (cellSize - gridWidth) * 2);
         paint.setTextSize(headerTextSize);
-        paint.setColor(blackTextColor);
+        paint.setColor(whiteTextColor);
         paint.setTextAlign(Paint.Align.LEFT);
-        int textShiftY = centerText() * 2;
-        int headerStartY = panelOriginalY - textShiftY;
-        canvas.drawText(getResources().getString(R.string.header), tableOriginalX, headerStartY, paint);
+        String str = getResources().getString(R.string.header);
+        float width = paint.measureText(str);
+        float startX = infoPanelOriginalX + (cellSize - gridWidth) * 2 / 2 - width / 2;
+        float endY = infoPanelOriginalY + (cellSize - gridWidth) / 3 - centerText() * 2 + textPaddingSize;
+        canvas.drawText(str, startX, endY, paint);
+    }
+
+
+    private void drawEndlessText(Canvas canvas) {
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTextSize(textSize);
+        paint.setColor(blackTextColor);
+        String str = getResources().getString(R.string.endless);
+        float width = paint.measureText(str);
+        float modeTextSize = 0.9f * (cellSize - gridWidth) * 2 / width * textSize;
+        paint.setTextSize(modeTextSize);
+        width = paint.measureText(str);
+        float startX = infoPanelOriginalX + (cellSize - gridWidth) * 2 / 2 - width / 2;
+        float endY = infoPanelOriginalY + (cellSize - gridWidth) * 4 / 3 - centerText() * 2;
+        canvas.drawText(str, startX, endY, paint);
     }
 
 //    private void drawInstructions(Canvas canvas) {
@@ -281,7 +322,10 @@ public class GameView extends View {
         drawDrawable(canvas, backgroundRectangle, tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
     }
 
-    //Renders the set of 16 background squares.
+    /**
+     * Renders the set of 16 background squares.
+     */
+
     private void drawBackgroundGrid(Canvas canvas) {
         Resources resources = getResources();
         Drawable backgroundCell = resources.getDrawable(R.drawable.cell_rectangle);
@@ -401,13 +445,6 @@ public class GameView extends View {
         }
     }
 
-    private void drawEndlessText(Canvas canvas) {
-
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTextSize(bodyTextSize);
-        paint.setColor(blackTextColor);
-        canvas.drawText(getResources().getString(R.string.endless), tableOriginalX, sYIcons - centerText() * 2, paint);
-    }
 
     private void createEndGameStates(Canvas canvas, boolean win, boolean showButton) {
         int width = tableEndingX - tableOriginalX;
@@ -532,9 +569,9 @@ public class GameView extends View {
         int boardMiddleX = screenMiddleX;
         int boardMiddleY = screenMiddleY + cellSize / 2;
         Log.i("ABC", "boardMiddleX:" + boardMiddleX + "-boardMiddleY:" + boardMiddleY);
-        iconSize = Math.min(width / 4, height / 4) / 2;
-//        iconSize = cellSize / 2;
-
+        functionButtonSize = Math.min(width / 4, height / 4) / 2;
+//        functionButtonSize = cellSize / 2;
+        modeButtonSize = Math.min(width / 4, height / 4) * 2;
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(cellSize);
         textSize = cellSize * cellSize / Math.max(cellSize, paint.measureText("000000"));
@@ -559,12 +596,13 @@ public class GameView extends View {
         paint.setTextSize(titleTextSize);
 
         int textShiftYAll = centerText();
+        //calc info panel origin position
+        infoPanelOriginalX = tableOriginalX;
+        infoPanelOriginalY = tableOriginalY - cellSize * 2;
+//        Log.i("ABC", "tableOriginalY:" + tableOriginalY + " sYALL:" + infoPanelOriginalY);
+////        infoPanelOriginalY=0;
 
-////        panelOriginalY = (int) (tableOriginalY - cellSize * 1.5);
-//        Log.i("ABC", "tableOriginalY:" + tableOriginalY + " sYALL:" + panelOriginalY);
-////        panelOriginalY=0;
-
-        titleTextOriginY = (int) (panelOriginalY + textPaddingSize + titleTextSize / 2 - textShiftYAll);
+        titleTextOriginY = (int) (infoPanelOriginalY + textPaddingSize + titleTextSize / 2 - textShiftYAll);
         bodyStartYAll = (int) (titleTextOriginY + textPaddingSize + titleTextSize / 2 + bodyTextSize / 2);
         Log.i("ABC", "textShiftYAll:" + textShiftYAll + " -titleTextOriginY:" + titleTextOriginY);
         titleWidthHighScore = (int) (paint.measureText(getResources().getString(R.string.high_score)));
@@ -573,10 +611,11 @@ public class GameView extends View {
 //        textShiftYAll = centerText();
         eYAll = (int) (bodyStartYAll + textShiftYAll + bodyTextSize / 2 + textPaddingSize);
 
-        sYIcons = (tableOriginalY + eYAll) / 2 - iconSize / 2;
-        sXNewGame = (tableEndingX - iconSize);
-        sXUndo = sXNewGame - iconSize * 3 / 2 - iconPaddingSize;
+        sYIcons = (tableOriginalY + eYAll) / 2 - functionButtonSize / 2;
+        sXNewGame = (tableEndingX - functionButtonSize);
+        sXUndo = sXNewGame - functionButtonSize * 3 / 2 - iconPaddingSize;
         resyncTime();
+
     }
 
     private int centerText() {
@@ -592,6 +631,7 @@ public class GameView extends View {
         try {
 
             //Getting assets
+            modeRectangleBg = resources.getDrawable(R.drawable.mode_background_rectangle);
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
