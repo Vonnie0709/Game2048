@@ -1,8 +1,10 @@
 package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.Cell;
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.SpConstant;
@@ -11,9 +13,11 @@ import com.vonnie.game.v2048.grid.Grid;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.weiget.GameView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Handler;
 
 /**
  * @author LongpingZou
@@ -32,7 +36,7 @@ public class MainGame {
     private static final long NOTIFICATION_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME * 5;
     private static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
 
-    private static final long STARTING_MAX_VALUE = 32;
+    private static final long STARTING_MAX_VALUE = 16;
     private static long endingMaxValue;
 
     private static final int GAME_WIN = 1;
@@ -72,12 +76,18 @@ public class MainGame {
 
     private GameView mView;
 
+    private MediaPlayer movePlayer;
+    private MediaPlayer mergePlayer;
+
     public MainGame(Context context, GameView view) {
         mContext = context;
         mView = view;
 ///        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
         endingMaxValue = Long.MAX_VALUE;
         Log.i("ABC", "endingMaxValue:" + endingMaxValue);
+        movePlayer = MediaPlayer.create(mContext, R.raw.move);
+        mergePlayer = MediaPlayer.create(mContext, R.raw.merge);
+
     }
 
     public void newGame() {
@@ -99,7 +109,7 @@ public class MainGame {
         addStartTiles();
         canUndo = false;
         mView.refreshLastTime = true;
-        mView.resyncTime();
+        mView.syncTime();
         mView.invalidate();
     }
 
@@ -216,7 +226,7 @@ public class MainGame {
 
                         // Converge the two tiles' positions
                         tile.updatePosition(positions[1]);
-
+                        mergePlayer.start();
                         int[] extras = {xx, yy};
                         //Direction: 0 = MOVING MERGED
                         animGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
@@ -232,7 +242,12 @@ public class MainGame {
                             gameState = gameState + GAME_WIN;
                             endGame();
                         }
+
+
                     } else {
+                        if (tile.getX() != positions[0].getX() || tile.getY() != positions[0].getY()) {
+                            movePlayer.start();
+                        }
                         moveTile(tile, positions[0]);
                         int[] extras = {xx, yy, 0};
                         //Direction: 1 = MOVING NO MERGE
@@ -251,7 +266,7 @@ public class MainGame {
             addRandomTile();
             checkLose();
         }
-        mView.resyncTime();
+        mView.syncTime();
         mView.invalidate();
     }
 

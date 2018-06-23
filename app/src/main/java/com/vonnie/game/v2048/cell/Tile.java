@@ -34,4 +34,6 @@ public class Tile extends Cell {
     public void setMergedFrom(Tile[] tile) {
         mergedFrom = tile;
     }
+
+
 }

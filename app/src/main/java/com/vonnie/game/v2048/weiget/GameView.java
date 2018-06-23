@@ -85,13 +85,30 @@ public class GameView extends View {
     /**
      * The origin of the Y axis of title text
      */
-    private int titleTextOriginY;
+    private int scoreTitleOriginY;
     /**
      * the width and height of mode panel
      */
     private int modePanelWidth;
-    private int bodyStartYAll;
-    private int eYAll;
+    /**
+     * the origin x of the axis X of menu
+     */
+    public int menuStartX;
+    /**
+     * the end x of the axis X of menu
+     */
+    public int menuEndX;
+    /**
+     * the origin y of the axis X of menu
+     */
+    public int menuTop;
+    /**
+     * the end y of the axis X of menu
+     */
+    public int menuBottom;
+    /**
+     * default text padding
+     */
     private int textPaddingSize;
 
     /**
@@ -113,10 +130,6 @@ public class GameView extends View {
      */
     private Drawable menuPanelBg;
 
-    /**
-     * background drawable of function panel,such as undo and new game
-     */
-    private Drawable functionPanelBg;
 
     /**
      * background drawable of function panel when its enabled
@@ -202,7 +215,7 @@ public class GameView extends View {
         canvas.drawBitmap(background, 0, 0, paint);
 
 //        drawScoreText(canvas);
-        drawMenuPanel(canvas);
+
         drawScorePanel(canvas);
         if (game.canUndo) {
             drawUndoButton(canvas, true);
@@ -243,7 +256,7 @@ public class GameView extends View {
         draw.draw(canvas);
     }
 
-    private void drawCellText(Canvas canvas, int value, int sX, int sY) {
+    private void drawCellText(Canvas canvas, int value, int startX, int startY) {
         int textShiftY = centerText();
         if (value >= 8) {
             paint.setColor(whiteTextColor);
@@ -253,7 +266,7 @@ public class GameView extends View {
         //To maintain font size, get a fixed font size
         float fitTextSize = baseTextSize * cellSize * 0.9f / Math.max(cellSize * 0.9f, paint.measureText(String.valueOf(value)));
         paint.setTextSize(fitTextSize);
-        canvas.drawText(String.valueOf(value), sX + cellSize / 2, sY + cellSize / 2 - textShiftY, paint);
+        canvas.drawText(String.valueOf(value), startX + cellSize / 2, startY + cellSize / 2 - textShiftY, paint);
     }
 
 
@@ -263,12 +276,20 @@ public class GameView extends View {
      * @param canvas
      */
     private void drawMenuPanel(Canvas canvas) {
-        int menuStartX = tableOriginalX * 2 + modePanelWidth;
-        int menuEndX = tableOriginalX * 2 + modePanelWidth + scorePanelWidth;
-        int menuTop = topLine + scorePanelWidth * 7 / 10;
-        int menuBottom = topLine + modePanelWidth;
+        menuStartX = tableOriginalX * 2 + modePanelWidth;
+        menuEndX = tableOriginalX * 2 + modePanelWidth + scorePanelWidth;
+        menuTop = topLine + scorePanelWidth * 7 / 10;
+        menuBottom = topLine + modePanelWidth;
         menuPanelBg.setBounds(menuStartX, menuTop, menuEndX, menuBottom);
         menuPanelBg.draw(canvas);
+        String str = getResources().getString(R.string.menu);
+        paint.setTextSize(baseTextSize);
+        float width = paint.measureText("00000000");
+        float textSize = baseTextSize * scorePanelWidth * 0.8f / Math.max(scorePanelWidth * 0.8f, width);
+        paint.setTextSize(textSize);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(whiteTextColor);
+        canvas.drawText(str, menuStartX + scorePanelWidth / 2, menuBottom - scorePanelWidth / 10, paint);
     }
 
 
@@ -338,70 +359,45 @@ public class GameView extends View {
         int highScorePanelBottom = topLine + scorePanelWidth * 6 / 10;
         scorePanelBg.setBounds(highScorePanelStartX, highScorePanelTop, highScorePanelEndX, highScorePanelBottom);
         scorePanelBg.draw(canvas);
-
+        paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(scoreTitleSize);
         paint.setColor(brownTextColor);
+
+
+        String scoreTitle = getResources().getString(R.string.score);
+        float scoreTitleX = scorePanelStartX + scorePanelWidth / 2;
+        canvas.drawText(scoreTitle, scoreTitleX, scoreTitleOriginY, paint);
+
 
         String highScoreTitle = getResources().getString(R.string.high_score);
         float highScoreTitleX = tableEndingX - (tableEndingX - highScorePanelStartX) / 2;
-        canvas.drawText(highScoreTitle, highScoreTitleX, titleTextOriginY, paint);
-        String scoreTitle = getResources().getString(R.string.score);
-        float scoreTitleX = scorePanelStartX + scorePanelWidth / 2;
-        canvas.drawText(scoreTitle, scoreTitleX, titleTextOriginY, paint);
+        canvas.drawText(highScoreTitle, highScoreTitleX, scoreTitleOriginY, paint);
+
+
+        String score = String.valueOf(game.currentScore);
+        String highScore = String.valueOf(game.historyHighScore);
+        paint.setColor(whiteTextColor);
+        paint.setTextSize(baseTextSize);
+        float standardWidth = paint.measureText("000000");
+
+        float scoreContentSize = baseTextSize * scorePanelWidth * 0.9f / Math.max(scorePanelWidth * 0.9f, standardWidth);
+        float highScoreContentSize = baseTextSize * scorePanelWidth * 0.9f / Math.max(scorePanelWidth * 0.9f, standardWidth);
+        //draw score text
+        paint.setTextSize(scoreContentSize);
+        canvas.drawText(score, scoreTitleX, scoreTitleOriginY + 3 * textPaddingSize, paint);
+        //draw high score text
+        paint.setTextSize(highScoreContentSize);
+        canvas.drawText(highScore, highScoreTitleX, scoreTitleOriginY + 3 * textPaddingSize, paint);
 
     }
 
-    private void drawScoreText(Canvas canvas) {
 
-        int scorePanelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 3 * tableOriginalX) / 2;
-        int scorePanelStartX = tableOriginalX * 2 + modePanelWidth;
-        int scorePanelEndX = tableOriginalX * 2 + modePanelWidth + scorePanelWidth;
-        scorePanelBg.setBounds(scorePanelStartX, topLine, scorePanelEndX, topLine + scorePanelWidth * 6 / 10);
-        scorePanelBg.draw(canvas);
-
-        //Drawing the currentScore text: Ver 2
-        paint.setTextSize(bodyTextSize);
-        paint.setTextAlign(Paint.Align.CENTER);
-
-        int bodyWidthHighScore = (int) (paint.measureText(String.valueOf(game.historyHighScore)));
-        int bodyWidthScore = (int) (paint.measureText(String.valueOf(game.currentScore)));
-
-        int textWidthHighScore = Math.max(titleWidthHighScore, bodyWidthHighScore) + textPaddingSize * 2;
-        int textWidthScore = Math.max(titleWidthScore, bodyWidthScore) + textPaddingSize * 2;
-
-        int textMiddleHighScore = textWidthHighScore / 2;
-        int textMiddleScore = textWidthScore / 2;
-
-        int eXHighScore = tableEndingX;
-        int sXHighScore = eXHighScore - textWidthHighScore;
-
-        int eXScore = sXHighScore - textPaddingSize;
-        int sXScore = eXScore - textWidthScore;
-
-        //Outputting high-scores box
-        scorePanelBg.setBounds(sXHighScore, topLine, eXHighScore, eYAll);
-        scorePanelBg.draw(canvas);
-        paint.setTextSize(scoreTitleSize);
-        paint.setColor(brownTextColor);
-        canvas.drawText(getResources().getString(R.string.high_score), sXHighScore + textMiddleHighScore, titleTextOriginY, paint);
-        paint.setTextSize(bodyTextSize);
-        paint.setColor(whiteTextColor);
-        canvas.drawText(String.valueOf(game.historyHighScore), sXHighScore + textMiddleHighScore, bodyStartYAll, paint);
-
-
-        //Outputting scores box
-        scorePanelBg.setBounds(sXScore, topLine, eXScore, eYAll);
-        scorePanelBg.draw(canvas);
-        paint.setTextSize(scoreTitleSize);
-        paint.setColor(brownTextColor);
-        canvas.drawText(getResources().getString(R.string.score), sXScore + textMiddleScore, titleTextOriginY, paint);
-        paint.setTextSize(bodyTextSize);
-        paint.setColor(whiteTextColor);
-        canvas.drawText(String.valueOf(game.currentScore), sXScore + textMiddleScore, bodyStartYAll, paint);
-    }
-
-
-    private void drawHeader(Canvas canvas) {
+    /**
+     * draw mode panel
+     *
+     * @param canvas
+     */
+    private void drawModelPanel(Canvas canvas) {
 
         modePanelBg.setBounds(tableOriginalX, topLine, tableOriginalX + modePanelWidth, topLine + modePanelWidth);
         modePanelBg.draw(canvas);
@@ -606,14 +602,12 @@ public class GameView extends View {
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(background);
-        drawHeader(canvas);
+        drawModelPanel(canvas);
+        drawMenuPanel(canvas);
         drawNewGameButton(canvas, true);
         drawUndoButton(canvas, false);
-//        drawUndoButton(canvas);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
-//        drawInstructions(canvas);
-
     }
 
     private void createBitmapCells() {
@@ -674,7 +668,7 @@ public class GameView extends View {
         lastFPSTime = currentTime;
     }
 
-    public void resyncTime() {
+    public void syncTime() {
         lastFPSTime = System.nanoTime();
     }
 
@@ -704,10 +698,13 @@ public class GameView extends View {
 
         // define (high)score title text size
         scoreTitleSize = baseTextSize / 2;
+        //define default text padding
+        textPaddingSize = (int) (baseTextSize / 3);
+
         bodyTextSize = (int) (baseTextSize / 1.5);
         instructionsTextSize = (int) (baseTextSize / 1.5);
         gameOverTextSize = baseTextSize * 2;
-        textPaddingSize = (int) (baseTextSize / 3);
+
         iconPaddingSize = (int) (baseTextSize / 5);
 
         double halfNumSquaresX = game.numSquaresX / 2d;
@@ -720,9 +717,6 @@ public class GameView extends View {
 
         paint.setTextSize(scoreTitleSize);
 
-        int textShiftYAll = centerText();
-
-
         // design two kind of size with mode panel
         float a = tableOriginalY * 3 / 5;
         float b = (cellSize - gridWidth) * 8 / 5;
@@ -730,26 +724,19 @@ public class GameView extends View {
         modePanelWidth = (int) Math.max(a, b);
         topLine = (tableOriginalY - modePanelWidth) / 4;
         //calc (high)score (menu)panel width
-        scorePanelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 3 * tableOriginalX) / 2;
+        scorePanelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 4 * tableOriginalX) / 2;
         //calc function button width/height
-        functionButtonWidth = scorePanelWidth / 2 - tableOriginalX;
+        functionButtonWidth = scorePanelWidth * 3 / 10 + 10;
         //calc origin y of the  Y axis of function button
         functionButtonTop = topLine + scorePanelWidth * 7 / 10;
         //calc origin x of the  X axis of new game button
         newGameFuntionStartX = tableEndingX - functionButtonWidth;
         //calc origin x of the  X axis of undo game button
         undoFunctionStartX = 3 * tableOriginalX + modePanelWidth + scorePanelWidth;
+        //calc origin y of the Y axis of score title
+        scoreTitleOriginY = topLine + textPaddingSize - 2 * centerText();
 
-        titleTextOriginY = (int) (topLine + textPaddingSize + scoreTitleSize / 2 - textShiftYAll);
-        bodyStartYAll = (int) (titleTextOriginY + textPaddingSize + scoreTitleSize / 2 + bodyTextSize / 2);
-        Log.i("ABC", "textShiftYAll:" + textShiftYAll + " -titleTextOriginY:" + titleTextOriginY);
-        titleWidthHighScore = (int) (paint.measureText(getResources().getString(R.string.high_score)));
-        titleWidthScore = (int) (paint.measureText(getResources().getString(R.string.score)));
-        paint.setTextSize(bodyTextSize);
-//        textShiftYAll = centerText();
-        eYAll = (int) (bodyStartYAll + textShiftYAll + bodyTextSize / 2 + textPaddingSize);
-
-        resyncTime();
+        syncTime();
 
     }
 
@@ -766,7 +753,6 @@ public class GameView extends View {
         try {
 
             //Getting assets
-            functionPanelBg = resources.getDrawable(R.drawable.function_background_rectangle);
             menuPanelBg = resources.getDrawable(R.drawable.menu_background_rectangle);
             scorePanelBg = resources.getDrawable(R.drawable.score_background_rectangle);
             modePanelBg = resources.getDrawable(R.drawable.mode_background_rectangle);
@@ -784,7 +770,7 @@ public class GameView extends View {
         } catch (Exception e) {
             System.out.println("Error getting assets?");
         }
-        setOnTouchListener(new OperationListener(this));
+        setOnTouchListener(new OperationListener(this, context));
         game.newGame();
     }
 

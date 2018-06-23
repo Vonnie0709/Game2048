@@ -1,9 +1,14 @@
 package com.vonnie.game.v2048.logic;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
+import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.weiget.GameView;
 
 /**
@@ -29,10 +34,14 @@ public class OperationListener implements View.OnTouchListener {
     private boolean hasMoved = false;
 
     private GameView mView;
+    private Context mContext;
 
-    public OperationListener(GameView view) {
+
+    public OperationListener(GameView view, Context context) {
         super();
         this.mView = view;
+        this.mContext = context;
+
     }
 
     @Override
@@ -78,6 +87,7 @@ public class OperationListener implements View.OnTouchListener {
                     }
                     if (pathMoved() > SWIPE_MIN_DISTANCE * SWIPE_MIN_DISTANCE && !hasMoved) {
                         boolean moved = false;
+
                         //Vertical
                         if (((dy >= SWIPE_THRESHOLD_VELOCITY && Math.abs(dy) >= Math.abs(dx)) || y - startingY >= MOVE_THRESHOLD) && previousDirection % 2 != 0) {
                             moved = true;
@@ -123,6 +133,8 @@ public class OperationListener implements View.OnTouchListener {
                         mView.game.newGame();
                     } else if (iconPressed(mView.undoFunctionStartX, mView.functionButtonTop)) {
                         mView.game.revertUndoState();
+                    } else if (iconPressed(mView.menuStartX, mView.menuTop, mView.menuEndX, mView.menuBottom)) {
+                        Log.i("ABC", "click");
                     } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
                         mView.game.setEndlessMode();
                     }
@@ -139,6 +151,10 @@ public class OperationListener implements View.OnTouchListener {
 
     private boolean iconPressed(int sx, int sy) {
         return isTap(1) && inRange(sx, x, sx + mView.functionButtonWidth) && inRange(sy, y, sy + mView.functionButtonWidth);
+    }
+
+    private boolean iconPressed(int sx, int sy, int endX, int endY) {
+        return isTap(2) && inRange(sx, x, endX) && inRange(sy, y, endY);
     }
 
     private boolean inRange(float starting, float check, float ending) {
