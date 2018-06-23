@@ -1,14 +1,10 @@
 package com.vonnie.game.v2048.logic;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.weiget.GameView;
 
 /**
@@ -129,12 +125,14 @@ public class OperationListener implements View.OnTouchListener {
                 veryLastDirection = 1;
                 //"Menu" inputs
                 if (!hasMoved) {
-                    if (iconPressed(mView.newGameFuntionStartX, mView.functionButtonTop)) {
+                    if (iconPressed(mView.newGameFunctionStartX, mView.functionButtonTop)) {
                         mView.game.newGame();
                     } else if (iconPressed(mView.undoFunctionStartX, mView.functionButtonTop)) {
                         mView.game.revertUndoState();
+                    } else if (iconPressed(mView.audioFunctionStartX, mView.functionButtonTop)) {
+                        Log.i("ABC", "audio click");
                     } else if (iconPressed(mView.menuStartX, mView.menuTop, mView.menuEndX, mView.menuBottom)) {
-                        Log.i("ABC", "click");
+                        Log.i("ABC", "menu click");
                     } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
                         mView.game.setEndlessMode();
                     }

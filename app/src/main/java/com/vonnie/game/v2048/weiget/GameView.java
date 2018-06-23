@@ -153,6 +153,16 @@ public class GameView extends View {
     public int functionButtonWidth;
 
     /**
+     * the origin x of the axis X of function
+     */
+    public int functionOriginX;
+
+    /**
+     * space between function buttons
+     */
+    public int functionButtonSpace;
+
+    /**
      * the origin of the Y axis of function button
      */
     public int functionButtonTop;
@@ -167,17 +177,16 @@ public class GameView extends View {
     private BitmapDrawable winGameFinalOverlay;
 
 
-    private int titleWidthHighScore;
-    private int titleWidthScore;
-
     /**
      * the start x of new game button
      */
-    public int newGameFuntionStartX;
+    public int newGameFunctionStartX;
     /**
      * the start x of undo game button
      */
     public int undoFunctionStartX;
+
+    public int audioFunctionStartX;
 
 
     long lastFPSTime = System.nanoTime();
@@ -294,6 +303,24 @@ public class GameView extends View {
 
 
     /**
+     * draw audio button
+     *
+     * @param canvas
+     * @param isEnabled
+     */
+    private void drawAudioButton(Canvas canvas, boolean isEnabled) {
+        int functionButtonEndX = tableEndingX - (functionButtonWidth + functionButtonSpace) * 2;
+        int functionButtonBottom = topLine + modePanelWidth;
+        if (isEnabled) {
+            enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            enableFunctionBg.draw(canvas);
+        } else {
+            disableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            disableFunctionBg.draw(canvas);
+        }
+    }
+
+    /**
      * draw undo game button
      *
      * @param canvas
@@ -301,7 +328,7 @@ public class GameView extends View {
      */
     private void drawUndoButton(Canvas canvas, boolean isEnabled) {
 
-        int functionButtonEndX = undoFunctionStartX + functionButtonWidth;
+        int functionButtonEndX = tableEndingX - functionButtonWidth - functionButtonSpace;
         int functionButtonBottom = topLine + modePanelWidth;
         if (isEnabled) {
             enableFunctionBg.setBounds(undoFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
@@ -328,16 +355,17 @@ public class GameView extends View {
         int functionButtonEndX = tableEndingX;
         int functionButtonBottom = topLine + modePanelWidth;
         if (isEnabled) {
-            enableFunctionBg.setBounds(newGameFuntionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            enableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             enableFunctionBg.draw(canvas);
         } else {
-            disableFunctionBg.setBounds(newGameFuntionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+            disableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             disableFunctionBg.draw(canvas);
         }
         Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
-        refresh.setBounds(newGameFuntionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
+        refresh.setBounds(newGameFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
         refresh.draw(canvas);
     }
+
 
     /**
      * draw the high score panel
@@ -606,6 +634,7 @@ public class GameView extends View {
         drawMenuPanel(canvas);
         drawNewGameButton(canvas, true);
         drawUndoButton(canvas, false);
+        drawAudioButton(canvas, true);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
     }
@@ -705,6 +734,7 @@ public class GameView extends View {
         instructionsTextSize = (int) (baseTextSize / 1.5);
         gameOverTextSize = baseTextSize * 2;
 
+        //define function button padding
         iconPaddingSize = (int) (baseTextSize / 5);
 
         double halfNumSquaresX = game.numSquaresX / 2d;
@@ -725,14 +755,21 @@ public class GameView extends View {
         topLine = (tableOriginalY - modePanelWidth) / 4;
         //calc (high)score (menu)panel width
         scorePanelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 4 * tableOriginalX) / 2;
+
+        //calc function origin x
+        functionOriginX = 3 * tableOriginalX + modePanelWidth + scorePanelWidth;
         //calc function button width/height
-        functionButtonWidth = scorePanelWidth * 3 / 10 + 10;
+        functionButtonWidth = scorePanelWidth * 3 / 10;
+        //calc spacing of function button
+        functionButtonSpace = ((tableEndingX - functionOriginX) - 3 * functionButtonWidth) / 2;
         //calc origin y of the  Y axis of function button
         functionButtonTop = topLine + scorePanelWidth * 7 / 10;
+        //calc origin x of the X axis of audio button
+        audioFunctionStartX = functionOriginX;
         //calc origin x of the  X axis of new game button
-        newGameFuntionStartX = tableEndingX - functionButtonWidth;
+        newGameFunctionStartX = tableEndingX - functionButtonWidth;
         //calc origin x of the  X axis of undo game button
-        undoFunctionStartX = 3 * tableOriginalX + modePanelWidth + scorePanelWidth;
+        undoFunctionStartX = tableEndingX - functionButtonWidth * 2 - functionButtonSpace;
         //calc origin y of the Y axis of score title
         scoreTitleOriginY = topLine + textPaddingSize - 2 * centerText();
 
