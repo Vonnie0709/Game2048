@@ -11,22 +11,22 @@ import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.grid.AnimGrid;
 import com.vonnie.game.v2048.grid.Grid;
+import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.view.SettlementActivity;
 import com.vonnie.game.v2048.weiget.GameView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Handler;
 
 /**
  * @author LongpingZou
  * @date 2018/6/19
  */
-public class MainGame {
+public class GameController {
 
+    private OnFunctionClickListener onFunctionClickListener;
     public static final int SPAWN_ANIMATION = -1;
     public static final int MOVE_ANIMATION = 0;
     public static final int MERGE_ANIMATION = 1;
@@ -41,11 +41,11 @@ public class MainGame {
     private static final long STARTING_MAX_VALUE = 16;
     private static long endingMaxValue;
 
-    private static final int GAME_WIN = 1;
-    private static final int GAME_LOST = -1;
-    private static final int GAME_NORMAL = 0;
-    private static final int GAME_ENDLESS = 2;
-    private static final int GAME_ENDLESS_WON = 3;
+    public static final int GAME_WIN = 1;
+    public static final int GAME_LOST = -1;
+    public static final int GAME_NORMAL = 0;
+    public static final int GAME_ENDLESS = 2;
+    public static final int GAME_ENDLESS_WON = 3;
 
     public Grid grid = null;
     public AnimGrid animGrid;
@@ -85,7 +85,7 @@ public class MainGame {
      */
     public boolean isAudioEnabled = true;
 
-    public MainGame(Context context, GameView view) {
+    public GameController(Context context, GameView view) {
         mContext = context;
         mView = view;
 ///        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
@@ -287,16 +287,6 @@ public class MainGame {
         }
     }
 
-    private void endGame() {
-        animGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
-        if (currentScore >= historyHighScore) {
-            historyHighScore = currentScore;
-            recordHighScore();
-        }
-        Intent intent = new Intent(mContext, SettlementActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(intent);
-    }
 
     private Cell getVector(int direction) {
         Cell[] map = {
@@ -343,8 +333,7 @@ public class MainGame {
         Cell nextCell = new Cell(cell.getX(), cell.getY());
         do {
             previous = nextCell;
-            nextCell = new Cell(previous.getX() + vector.getX(),
-                    previous.getY() + vector.getY());
+            nextCell = new Cell(previous.getX() + vector.getX(), previous.getY() + vector.getY());
         } while (grid.isCellWithinBounds(nextCell) && grid.isCellAvailable(nextCell));
 
         return new Cell[]{previous, nextCell};
@@ -401,7 +390,47 @@ public class MainGame {
         return !(gameState == GAME_ENDLESS || gameState == GAME_ENDLESS_WON);
     }
 
+    private void endGame() {
+        animGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
+        if (currentScore >= historyHighScore) {
+            historyHighScore = currentScore;
+            recordHighScore();
+        }
+        onEndOfGame();
+    }
+
     public void onAudioClick() {
-        isAudioEnabled = !isAudioEnabled;
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onMuteButtonClick();
+        }
+    }
+
+    public void onMenuClick() {
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onMenuButtonClick();
+        }
+    }
+
+    public void onUndoClick() {
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onUndoButtonClick();
+        }
+    }
+
+    public void onNewGameClick() {
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onNewGameButtonClick();
+        }
+    }
+
+    public void onEndOfGame() {
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onEndOfGame();
+        }
+    }
+
+
+    public void setOnFunctionClickListener(OnFunctionClickListener onFunctionClickListener) {
+        this.onFunctionClickListener = onFunctionClickListener;
     }
 }

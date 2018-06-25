@@ -7,7 +7,6 @@
 
     <string name="high_score">HIGH SCORE</string>
     <string name="score">SCORE</string>
-    <string name="instructions">Swipe to move. 2 + 2 = 4. Reach 2048.</string>
     <string name="you_win">You Win!</string>
     <string name="game_over">Game Over!</string>
     <string name="go_on">Tap to Continue</string>
@@ -16,4 +15,17 @@
     <string name="menu">Menu</string>
 
     <string name="share">Share</string>
+
+    <string name="settlement_score">SCORE</string>
+    <string name="settlement_continue">Continue</string>
+    <string name="settlement_share">Share</string>
+    <string name="settlement_new_game">New Game</string>
+    <string name="settlement_win">You Win!</string>
+    <string name="settlement_game_over">Game Over!</string>
+
+    <string name="menu_title">MENU</string>
+    <string name="menu_continue">Resume</string>
+    <string name="menu_new_game">New Game</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_mode">Mode</string>
 </resources>

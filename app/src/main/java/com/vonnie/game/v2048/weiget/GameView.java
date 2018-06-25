@@ -14,8 +14,8 @@ import android.view.View;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.AnimCell;
 import com.vonnie.game.v2048.cell.Tile;
-import com.vonnie.game.v2048.logic.MainGame;
-import com.vonnie.game.v2048.logic.OperationListener;
+import com.vonnie.game.v2048.logic.GameController;
+import com.vonnie.game.v2048.listener.OnControlListener;
 
 import java.util.ArrayList;
 
@@ -30,9 +30,6 @@ public class GameView extends View {
 
     private Drawable fadeRectangle;
     private Bitmap background = null;
-    private BitmapDrawable loseGameOverlay;
-    private BitmapDrawable winGameContinueOverlay;
-    private BitmapDrawable winGameFinalOverlay;
     long lastFPSTime = System.nanoTime();
     long currentTime = System.nanoTime();
     public boolean refreshLastTime = true;
@@ -40,10 +37,6 @@ public class GameView extends View {
      * paint
      */
     private Paint paint = new Paint();
-    /**
-     * game object
-     */
-    public MainGame game;
 
     /**
      * width and height of cell
@@ -215,27 +208,24 @@ public class GameView extends View {
 
         drawScorePanel(canvas);
         drawCells(canvas);
-        if (game.canUndo) {
+        drawMuteButton(canvas, gameController.isAudioEnabled);
+
+        if (gameController.canUndo) {
             drawUndoButton(canvas, true);
         }
-
-        if (game.isAudioEnabled) {
-            drawAudioButton(canvas, true);
-        }
-        if (!game.isActive()) {
-
-            drawEndGameState(canvas);
-        }
-        if (!game.canContinue()) {
+//        if (!gameController.isActive()) {
+//            drawEndGameState(canvas);
+//        }
+        if (!gameController.canContinue()) {
             drawEndlessText(canvas);
         }
 
         //Refresh the screen if there is still an animation running
-        if (game.animGrid.isAnimationActive()) {
+        if (gameController.animGrid.isAnimationActive()) {
             invalidate(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
             tick();
             //Refresh one last time on game end.
-        } else if (!game.isActive() && refreshLastTime) {
+        } else if (!gameController.isActive() && refreshLastTime) {
             invalidate();
             refreshLastTime = false;
         }
@@ -248,8 +238,6 @@ public class GameView extends View {
         getLayout(width, height);
         createBitmapCells();
         createBackgroundBitmap(width, height);
-        createOverlays();
-        createSettlementView(width,height);
     }
 
     private void drawDrawable(Canvas canvas, Drawable draw, int startingX, int startingY, int endingX, int endingY) {
@@ -300,16 +288,21 @@ public class GameView extends View {
      * @param canvas
      * @param isEnabled
      */
-    private void drawAudioButton(Canvas canvas, boolean isEnabled) {
+    private void drawMuteButton(Canvas canvas, boolean isEnabled) {
         int functionButtonEndX = tableEndingX - (functionButtonWidth + functionButtonSpace) * 2;
         int functionButtonBottom = topLine + panelWidth;
+
+        Drawable mute;
+
         if (isEnabled) {
-            enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            enableFunctionBg.draw(canvas);
+            mute = getResources().getDrawable(R.drawable.icon_mute_enable);
         } else {
-            disableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            disableFunctionBg.draw(canvas);
+            mute = getResources().getDrawable(R.drawable.icon_mute_disable);
         }
+        enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
+        enableFunctionBg.draw(canvas);
+        mute.setBounds(audioFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
+        mute.draw(canvas);
     }
 
     /**
@@ -394,8 +387,8 @@ public class GameView extends View {
         canvas.drawText(highScoreTitle, highScoreTitleX, scoreTitleOriginY, paint);
 
 
-        String score = String.valueOf(game.currentScore);
-        String highScore = String.valueOf(game.historyHighScore);
+        String score = String.valueOf(gameController.currentScore);
+        String highScore = String.valueOf(gameController.historyHighScore);
         paint.setColor(whiteTextColor);
         paint.setTextSize(baseTextSize);
         float standardWidth = paint.measureText("000000");
@@ -473,8 +466,8 @@ public class GameView extends View {
         Resources resources = getResources();
         Drawable backgroundCell = resources.getDrawable(R.drawable.cell_rectangle);
         // Outputting the game grid
-        for (int xx = 0; xx < game.numSquaresX; xx++) {
-            for (int yy = 0; yy < game.numSquaresY; yy++) {
+        for (int xx = 0; xx < gameController.numSquaresX; xx++) {
+            for (int yy = 0; yy < gameController.numSquaresY; yy++) {
                 int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
                 int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
@@ -489,33 +482,33 @@ public class GameView extends View {
         paint.setTextSize(baseTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
         // Outputting the individual cells
-        for (int xx = 0; xx < game.numSquaresX; xx++) {
-            for (int yy = 0; yy < game.numSquaresY; yy++) {
+        for (int xx = 0; xx < gameController.numSquaresX; xx++) {
+            for (int yy = 0; yy < gameController.numSquaresY; yy++) {
                 int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
                 int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
                 int eY = sY + cellSize;
 
-                Tile currentTile = game.grid.getCellContent(xx, yy);
+                Tile currentTile = gameController.grid.getCellContent(xx, yy);
                 if (currentTile != null) {
                     //Get and represent the value of the tile
                     int value = currentTile.getValue();
                     int index = log2(value);
 
                     //Check for any active animations
-                    ArrayList<AnimCell> aArray = game.animGrid.getAnimCell(xx, yy);
+                    ArrayList<AnimCell> aArray = gameController.animGrid.getAnimCell(xx, yy);
                     boolean animated = false;
                     for (int i = aArray.size() - 1; i >= 0; i--) {
                         AnimCell aCell = aArray.get(i);
                         //If this animation is not active, skip it
-                        if (aCell.getAnimationType() == MainGame.SPAWN_ANIMATION) {
+                        if (aCell.getAnimationType() == GameController.SPAWN_ANIMATION) {
                             animated = true;
                         }
                         if (!aCell.isActive()) {
                             continue;
                         }
                         // Spawning animation
-                        if (aCell.getAnimationType() == MainGame.SPAWN_ANIMATION) {
+                        if (aCell.getAnimationType() == GameController.SPAWN_ANIMATION) {
                             double percentDone = aCell.getPercentageDone();
                             float textScaleSize = (float) (percentDone);
                             paint.setTextSize(baseTextSize * textScaleSize);
@@ -524,7 +517,7 @@ public class GameView extends View {
                             bitmapCell[index].setBounds((int) (sX + cellScaleSize), (int) (sY + cellScaleSize), (int) (eX - cellScaleSize), (int) (eY - cellScaleSize));
                             bitmapCell[index].draw(canvas);
                             // Merging Animation
-                        } else if (aCell.getAnimationType() == MainGame.MERGE_ANIMATION) {
+                        } else if (aCell.getAnimationType() == GameController.MERGE_ANIMATION) {
                             double percentDone = aCell.getPercentageDone();
                             float textScaleSize = (float) (1 + INITIAL_VELOCITY * percentDone + MERGING_ACCELERATION * percentDone * percentDone / 2);
                             paint.setTextSize(baseTextSize * textScaleSize);
@@ -533,7 +526,7 @@ public class GameView extends View {
                             bitmapCell[index].setBounds((int) (sX + cellScaleSize), (int) (sY + cellScaleSize), (int) (eX - cellScaleSize), (int) (eY - cellScaleSize));
                             bitmapCell[index].draw(canvas);
                             // Moving animation
-                        } else if (aCell.getAnimationType() == MainGame.MOVE_ANIMATION) {
+                        } else if (aCell.getAnimationType() == GameController.MOVE_ANIMATION) {
                             double percentDone = aCell.getPercentageDone();
                             int tempIndex = index;
                             if (aArray.size() >= 2) {
@@ -561,63 +554,33 @@ public class GameView extends View {
         }
     }
 
-    private void drawEndGameState(Canvas canvas) {
-        double alphaChange = 1;
-        continueButtonEnabled = false;
-        for (AnimCell animation : game.animGrid.globalAnimation) {
-            if (animation.getAnimationType() == MainGame.FADE_GLOBAL_ANIMATION) {
-                alphaChange = animation.getPercentageDone();
-            }
-        }
-        BitmapDrawable displayOverlay = null;
-        if (game.gameWon()) {
-            if (game.canContinue()) {
-                continueButtonEnabled = true;
-                displayOverlay = winGameContinueOverlay;
-            } else {
-                displayOverlay = winGameFinalOverlay;
-            }
-        } else if (game.gameLost()) {
-            displayOverlay = loseGameOverlay;
-        }
+//    private void drawEndGameState(Canvas canvas) {
+//        double alphaChange = 1;
+//        continueButtonEnabled = false;
+//        for (AnimCell animation : gameController.animGrid.globalAnimation) {
+//            if (animation.getAnimationType() == GameController.FADE_GLOBAL_ANIMATION) {
+//                alphaChange = animation.getPercentageDone();
+//            }
+//        }
+//        BitmapDrawable displayOverlay = null;
+//        if (gameController.gameWon()) {
+//            if (gameController.canContinue()) {
+//                continueButtonEnabled = true;
+//                displayOverlay = winGameContinueOverlay;
+//            } else {
+//                displayOverlay = winGameFinalOverlay;
+//            }
+//        } else if (gameController.gameLost()) {
+//            displayOverlay = loseGameOverlay;
+//        }
+//
+//        if (displayOverlay != null) {
+//            displayOverlay.setBounds(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
+//            displayOverlay.setAlpha((int) (255 * alphaChange));
+//            displayOverlay.draw(canvas);
+//        }
+//    }
 
-        if (displayOverlay != null) {
-            displayOverlay.setBounds(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
-            displayOverlay.setAlpha((int) (255 * alphaChange));
-            displayOverlay.draw(canvas);
-        }
-    }
-
-
-    private void createEndGameStates(Canvas canvas, boolean win, boolean showButton) {
-        int width = tableEndingX - tableOriginalX;
-        int length = tableEndingY - tableOriginalY;
-        int middleX = width / 2;
-        int middleY = length / 2;
-        if (win) {
-            enableFunctionBg.setAlpha(127);
-            drawDrawable(canvas, enableFunctionBg, 0, 0, width, length);
-            enableFunctionBg.setAlpha(255);
-            paint.setColor(whiteTextColor);
-            paint.setAlpha(255);
-            paint.setTextSize(gameOverTextSize);
-            paint.setTextAlign(Paint.Align.CENTER);
-            int textBottom = middleY - centerText();
-            canvas.drawText(getResources().getString(R.string.you_win), middleX, textBottom, paint);
-            paint.setTextSize(bodyTextSize);
-            String text = showButton ? getResources().getString(R.string.go_on) : getResources().getString(R.string.for_now);
-            canvas.drawText(text, middleX, textBottom + textPaddingSize * 2 - centerText() * 2, paint);
-        } else {
-            fadeRectangle.setAlpha(127);
-            drawDrawable(canvas, fadeRectangle, 0, 0, width, length);
-            fadeRectangle.setAlpha(255);
-            paint.setColor(blackTextColor);
-            paint.setAlpha(255);
-            paint.setTextSize(gameOverTextSize);
-            paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(getResources().getString(R.string.game_over), middleX, middleY - centerText(), paint);
-        }
-    }
 
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -626,7 +589,7 @@ public class GameView extends View {
         drawMenuPanel(canvas);
         drawNewGameButton(canvas, true);
         drawUndoButton(canvas, false);
-        drawAudioButton(canvas, game.isAudioEnabled);
+        drawMuteButton(canvas, gameController.isAudioEnabled);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
     }
@@ -668,33 +631,9 @@ public class GameView extends View {
     }
 
 
-    private void createSettlementView(int width, int height) {
-        Resources resources = getResources();
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        loseGameOverlay = new BitmapDrawable(resources, bitmap);
-        createEndGameStates(canvas, false, false);
-    }
-
-    private void createOverlays() {
-        Resources resources = getResources();
-        Bitmap bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        createEndGameStates(canvas, true, true);
-        winGameContinueOverlay = new BitmapDrawable(resources, bitmap);
-        bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        createEndGameStates(canvas, true, false);
-        winGameFinalOverlay = new BitmapDrawable(resources, bitmap);
-        bitmap = Bitmap.createBitmap(tableEndingX - tableOriginalX, tableEndingY - tableOriginalY, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        createEndGameStates(canvas, false, false);
-        loseGameOverlay = new BitmapDrawable(resources, bitmap);
-    }
-
     private void tick() {
         currentTime = System.nanoTime();
-        game.animGrid.tickAll(currentTime - lastFPSTime);
+        gameController.animGrid.tickAll(currentTime - lastFPSTime);
         lastFPSTime = currentTime;
     }
 
@@ -711,9 +650,9 @@ public class GameView extends View {
 
     private void getLayout(int width, int height) {
         //considering rotating screen ,numSquaresY need to add 3 points
-        cellSize = Math.min(width / (game.numSquaresX + 1), height / (game.numSquaresY + 3));
+        cellSize = Math.min(width / (gameController.numSquaresX + 1), height / (gameController.numSquaresY + 3));
         //calc width of grid spacing
-        gridWidth = cellSize / (game.numSquaresX + 3);
+        gridWidth = cellSize / (gameController.numSquaresX + 3);
 
         int screenMiddleX = width / 2;
         int screenMiddleY = height / 2;
@@ -737,8 +676,8 @@ public class GameView extends View {
         //define function button padding
         iconPaddingSize = (int) (baseTextSize / 5);
 
-        double halfNumSquaresX = game.numSquaresX / 2d;
-        double halfNumSquaresY = game.numSquaresY / 2d;
+        double halfNumSquaresX = gameController.numSquaresX / 2d;
+        double halfNumSquaresY = gameController.numSquaresY / 2d;
 
         tableOriginalX = (int) (boardMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
         tableEndingX = (int) (boardMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
@@ -751,12 +690,10 @@ public class GameView extends View {
         float a = tableOriginalY * 3 / 5;
         float b = (cellSize - gridWidth) * 8 / 5;
         // choose suitable size
-//        panelWidth = (int) Math.max(a, b);
         panelWidth = ((tableEndingX - tableOriginalX) - 2 * tableOriginalX) / 3;
         topLine = (tableOriginalY - panelWidth) / 4;
         //calc (high)score (menu)panel width
         panelWidth = ((tableEndingX - tableOriginalX) - panelWidth - 4 * tableOriginalX) / 2;
-        panelWidth = panelWidth;
         //calc function origin x
         functionOriginX = 3 * tableOriginalX + panelWidth + panelWidth;
         //calc function button width/height
@@ -787,7 +724,6 @@ public class GameView extends View {
 
         Resources resources = context.getResources();
         //Loading resources
-        game = new MainGame(context, this);
         try {
 
             //Getting assets
@@ -805,11 +741,16 @@ public class GameView extends View {
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "ClearSans-Bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
+            setOnTouchListener(new OnControlListener(this));
         } catch (Exception e) {
             System.out.println("Error getting assets?");
         }
-        setOnTouchListener(new OperationListener(this, context));
-        game.newGame();
+    }
+
+    public GameController gameController;
+
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
     }
 
 }

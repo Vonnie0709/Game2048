@@ -1,7 +1,5 @@
-package com.vonnie.game.v2048.logic;
+package com.vonnie.game.v2048.listener;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -11,7 +9,7 @@ import com.vonnie.game.v2048.weiget.GameView;
  * @author LongpingZou
  * @date 2018/6/19
  */
-public class OperationListener implements View.OnTouchListener {
+public class OnControlListener implements View.OnTouchListener {
     private static final int SWIPE_MIN_DISTANCE = 0;
     private static final int SWIPE_THRESHOLD_VELOCITY = 25;
     private static final int MOVE_THRESHOLD = 250;
@@ -30,13 +28,11 @@ public class OperationListener implements View.OnTouchListener {
     private boolean hasMoved = false;
 
     private GameView mView;
-    private Context mContext;
 
 
-    public OperationListener(GameView view, Context context) {
+    public OnControlListener(GameView view) {
         super();
         this.mView = view;
-        this.mContext = context;
 
     }
 
@@ -58,7 +54,7 @@ public class OperationListener implements View.OnTouchListener {
             case MotionEvent.ACTION_MOVE:
                 x = event.getX();
                 y = event.getY();
-                if (mView.game.isActive()) {
+                if (mView.gameController.isActive()) {
                     float dx = x - previousX;
                     if (Math.abs(lastdx + dx) < Math.abs(lastdx) + Math.abs(dx) && Math.abs(dx) > RESET_STARTING
                             && Math.abs(x - startingX) > SWIPE_MIN_DISTANCE) {
@@ -89,24 +85,24 @@ public class OperationListener implements View.OnTouchListener {
                             moved = true;
                             previousDirection = previousDirection * 2;
                             veryLastDirection = 2;
-                            mView.game.move(2);
+                            mView.gameController.move(2);
                         } else if (((dy <= -SWIPE_THRESHOLD_VELOCITY && Math.abs(dy) >= Math.abs(dx)) || y - startingY <= -MOVE_THRESHOLD) && previousDirection % 3 != 0) {
                             moved = true;
                             previousDirection = previousDirection * 3;
                             veryLastDirection = 3;
-                            mView.game.move(0);
+                            mView.gameController.move(0);
                         }
                         //Horizontal
                         if (((dx >= SWIPE_THRESHOLD_VELOCITY && Math.abs(dx) >= Math.abs(dy)) || x - startingX >= MOVE_THRESHOLD) && previousDirection % 5 != 0) {
                             moved = true;
                             previousDirection = previousDirection * 5;
                             veryLastDirection = 5;
-                            mView.game.move(1);
+                            mView.gameController.move(1);
                         } else if (((dx <= -SWIPE_THRESHOLD_VELOCITY && Math.abs(dx) >= Math.abs(dy)) || x - startingX <= -MOVE_THRESHOLD) && previousDirection % 7 != 0) {
                             moved = true;
                             previousDirection = previousDirection * 7;
                             veryLastDirection = 7;
-                            mView.game.move(3);
+                            mView.gameController.move(3);
                         }
                         if (moved) {
                             hasMoved = true;
@@ -126,15 +122,15 @@ public class OperationListener implements View.OnTouchListener {
                 //"Menu" inputs
                 if (!hasMoved) {
                     if (iconPressed(mView.newGameFunctionStartX, mView.functionButtonTop)) {
-                        mView.game.newGame();
+                        mView.gameController.onNewGameClick();
                     } else if (iconPressed(mView.undoFunctionStartX, mView.functionButtonTop)) {
-                        mView.game.revertUndoState();
+                        mView.gameController.onUndoClick();
                     } else if (iconPressed(mView.audioFunctionStartX, mView.functionButtonTop)) {
-                        mView.game.onAudioClick();
+                        mView.gameController.onAudioClick();
                     } else if (iconPressed(mView.menuStartX, mView.menuTop, mView.menuEndX, mView.menuBottom)) {
-                        Log.i("ABC", "menu click");
+                        mView.gameController.onMenuClick();
                     } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
-                        mView.game.setEndlessMode();
+                        mView.gameController.setEndlessMode();
                     }
                 }
             default:

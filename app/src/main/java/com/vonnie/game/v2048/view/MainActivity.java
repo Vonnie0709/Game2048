@@ -1,6 +1,8 @@
 package com.vonnie.game.v2048.view;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -8,23 +10,36 @@ import android.view.KeyEvent;
 import android.view.Window;
 
 import com.vonnie.game.v2048.cell.Tile;
+import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.constant.SpConstant;
+import com.vonnie.game.v2048.listener.OnFunctionClickListener;
+import com.vonnie.game.v2048.logic.GameController;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.weiget.GameView;
 
 /**
  * @author LongpingZou
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnFunctionClickListener {
 
 
-    private GameView view;
+    private GameController gameController;
+    private final static int REQUEST_CODE_MENU = 0;
+    private final static int REQUEST_CODE_SETTLEMENT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        view = new GameView(getBaseContext());
+        initView(savedInstanceState);
+    }
+
+    private void initView(Bundle savedInstanceState) {
+        GameView view = new GameView(getBaseContext());
+        gameController = new GameController(this, view);
+        gameController.setOnFunctionClickListener(this);
+        gameController.newGame();
+        view.setGameController(gameController);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(SpConstant.SAVE_INSTANCE)) {
@@ -32,13 +47,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         setContentView(view);
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
-
-
     }
 
     @Override
@@ -46,16 +58,16 @@ public class MainActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-            view.game.move(2);
+            gameController.move(2);
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-            view.game.move(0);
+            gameController.move(0);
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-            view.game.move(3);
+            gameController.move(3);
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-            view.game.move(1);
+            gameController.move(1);
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -75,11 +87,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void save() {
-        Tile[][] field = view.game.grid.field;
-        Tile[][] undoField = view.game.grid.undoField;
+        Tile[][] field = gameController.grid.field;
+        Tile[][] undoField = gameController.grid.undoField;
         SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
         SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
-        Log.i("ABC", "fieldLength:" + field.length);
         for (int xx = 0; xx < field.length; xx++) {
             for (int yy = 0; yy < field[0].length; yy++) {
                 if (field[xx][yy] != null) {
@@ -95,14 +106,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        SharedPreferenceUtil.put(this, SpConstant.SCORE, view.game.currentScore);
-        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_TEMP, view.game.historyHighScore);
-        SharedPreferenceUtil.put(this, SpConstant.UNDO_SCORE, view.game.lastScore);
-        SharedPreferenceUtil.put(this, SpConstant.CAN_UNDO, view.game.canUndo);
-        SharedPreferenceUtil.put(this, SpConstant.GAME_STATE, view.game.gameState);
-        SharedPreferenceUtil.put(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
-        SharedPreferenceUtil.put(this, SpConstant.AUDIO_ENABLED, view.game.isAudioEnabled);
-        Log.i("ABC", "save:view.game.gameState:" + view.game.gameState);
+        SharedPreferenceUtil.put(this, SpConstant.SCORE, gameController.currentScore);
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_TEMP, gameController.historyHighScore);
+        SharedPreferenceUtil.put(this, SpConstant.UNDO_SCORE, gameController.lastScore);
+        SharedPreferenceUtil.put(this, SpConstant.CAN_UNDO, gameController.canUndo);
+        SharedPreferenceUtil.put(this, SpConstant.GAME_STATE, gameController.gameState);
+        SharedPreferenceUtil.put(this, SpConstant.UNDO_GAME_STATE, gameController.lastGameState);
+        SharedPreferenceUtil.put(this, SpConstant.AUDIO_ENABLED, gameController.isAudioEnabled);
     }
 
     @Override
@@ -113,37 +123,89 @@ public class MainActivity extends AppCompatActivity {
 
     private void load() {
         //Stopping all animations
-        view.game.animGrid.cancelAnimations();
+        gameController.animGrid.cancelAnimations();
 
-        for (int xx = 0; xx < view.game.grid.field.length; xx++) {
-            for (int yy = 0; yy < view.game.grid.field[0].length; yy++) {
+        for (int xx = 0; xx < gameController.grid.field.length; xx++) {
+            for (int yy = 0; yy < gameController.grid.field[0].length; yy++) {
                 int value = (int) SharedPreferenceUtil.get(this, xx + "_" + yy, -1);
                 if (value > 0) {
-                    view.game.grid.field[xx][yy] = new Tile(xx, yy, value);
+                    gameController.grid.field[xx][yy] = new Tile(xx, yy, value);
                 } else if (value == 0) {
-                    view.game.grid.field[xx][yy] = null;
+                    gameController.grid.field[xx][yy] = null;
                 }
 
                 int undoValue = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GRID + xx + "_" + yy, -1);
                 if (undoValue > 0) {
-                    view.game.grid.undoField[xx][yy] = new Tile(xx, yy, undoValue);
+                    gameController.grid.undoField[xx][yy] = new Tile(xx, yy, undoValue);
                 } else if (value == 0) {
-                    view.game.grid.undoField[xx][yy] = null;
+                    gameController.grid.undoField[xx][yy] = null;
                 }
             }
         }
 
-        view.game.currentScore = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, view.game.currentScore);
-        view.game.historyHighScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, view.game.historyHighScore);
-        view.game.lastScore = (long) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, view.game.lastScore);
-        view.game.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, view.game.canUndo);
-        view.game.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, view.game.gameState);
-        view.game.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
-        view.game.isAudioEnabled = (boolean) SharedPreferenceUtil.get(this, SpConstant.AUDIO_ENABLED, view.game.isAudioEnabled);
-        Log.i("ABC", "get:view.game.gameState:" + view.game.gameState);
+        gameController.currentScore = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, gameController.currentScore);
+        gameController.historyHighScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, gameController.historyHighScore);
+        gameController.lastScore = (long) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, gameController.lastScore);
+        gameController.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, gameController.canUndo);
+        gameController.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, gameController.gameState);
+        gameController.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, gameController.lastGameState);
+        gameController.isAudioEnabled = (boolean) SharedPreferenceUtil.get(this, SpConstant.AUDIO_ENABLED, gameController.isAudioEnabled);
     }
 
-//    /**
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_MENU) {
+            if (resultCode == Constants.RESULT_CODE_RESUME) {
+
+            } else if (resultCode == Constants.RESULT_CODE_NEW_GAME) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameController.newGame();
+                    }
+                });
+
+            } else if (resultCode == Constants.RESULT_CODE_MODE) {
+
+            } else if (resultCode == Constants.RESULT_CODE_SHARE) {
+
+            }
+        }
+    }
+
+    @Override
+    public void onMenuButtonClick() {
+        Intent intent = new Intent(this, MenuActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_MENU);
+    }
+
+    @Override
+    public void onMuteButtonClick() {
+        gameController.isAudioEnabled = !gameController.isAudioEnabled;
+    }
+
+    @Override
+    public void onUndoButtonClick() {
+        gameController.revertUndoState();
+    }
+
+    @Override
+    public void onNewGameButtonClick() {
+        gameController.newGame();
+    }
+
+    @Override
+    public void onEndOfGame() {
+        Intent intent = new Intent(this, SettlementActivity.class);
+        intent.putExtra(SettlementActivity.INTENT_SCORE, gameController.currentScore);
+        intent.putExtra(SettlementActivity.INTENT_GAME_STATUS, gameController.gameState);
+        startActivityForResult(intent, REQUEST_CODE_SETTLEMENT);
+        Log.i("ABC", "ameController.currentScore:" + gameController.currentScore);
+    }
+
+
+    //    /**
 //     * 有米广告
 //     */
 //    private void initYMAds() {

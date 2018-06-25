@@ -21,6 +21,8 @@
         <activity
             android:name=".view.SettlementActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".view.MenuActivity" />
     </application>
 
 </manifest>
