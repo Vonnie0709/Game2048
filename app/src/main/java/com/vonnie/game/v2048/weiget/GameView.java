@@ -24,6 +24,18 @@ import java.util.ArrayList;
  * @date 2018/6/19
  */
 public class GameView extends View {
+    public final int numCellTypes = 18;
+    public boolean continueButtonEnabled = false;
+    private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
+
+    private Drawable fadeRectangle;
+    private Bitmap background = null;
+    private BitmapDrawable loseGameOverlay;
+    private BitmapDrawable winGameContinueOverlay;
+    private BitmapDrawable winGameFinalOverlay;
+    long lastFPSTime = System.nanoTime();
+    long currentTime = System.nanoTime();
+    public boolean refreshLastTime = true;
     /**
      * paint
      */
@@ -32,8 +44,6 @@ public class GameView extends View {
      * game object
      */
     public MainGame game;
-    public final int numCellTypes = 18;
-    public boolean continueButtonEnabled = false;
 
     /**
      * width and height of cell
@@ -89,7 +99,7 @@ public class GameView extends View {
     /**
      * the width and height of mode panel
      */
-    private int modePanelWidth;
+    private int panelWidth;
     /**
      * the origin x of the axis X of menu
      */
@@ -130,22 +140,16 @@ public class GameView extends View {
      */
     private Drawable menuPanelBg;
 
-
     /**
      * background drawable of function panel when its enabled
      */
     private Drawable enableFunctionBg;
-
 
     /**
      * background drawable of function panel when its disabled
      */
     private Drawable disableFunctionBg;
 
-    /**
-     * width and height of score panel
-     */
-    private int scorePanelWidth;
 
     /**
      * width of function button
@@ -167,16 +171,6 @@ public class GameView extends View {
      */
     public int functionButtonTop;
 
-    private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
-
-
-    private Drawable fadeRectangle;
-    private Bitmap background = null;
-    private BitmapDrawable loseGameOverlay;
-    private BitmapDrawable winGameContinueOverlay;
-    private BitmapDrawable winGameFinalOverlay;
-
-
     /**
      * the start x of new game button
      */
@@ -186,11 +180,10 @@ public class GameView extends View {
      */
     public int undoFunctionStartX;
 
+    /**
+     * the start x of audio game button
+     */
     public int audioFunctionStartX;
-
-
-    long lastFPSTime = System.nanoTime();
-    long currentTime = System.nanoTime();
 
     /**
      * text size of title,such as 'currentScore & high currentScore'
@@ -203,12 +196,10 @@ public class GameView extends View {
     private float bodyTextSize;
 
     /**
-     * text size of introduce
+     * text size of  game over tips
      */
-    private float instructionsTextSize;
     private float gameOverTextSize;
 
-    public boolean refreshLastTime = true;
 
     /**
      * Internal Constants
@@ -220,21 +211,21 @@ public class GameView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-
         canvas.drawBitmap(background, 0, 0, paint);
 
-//        drawScoreText(canvas);
-
         drawScorePanel(canvas);
+        drawCells(canvas);
         if (game.canUndo) {
             drawUndoButton(canvas, true);
         }
-        drawCells(canvas);
 
+        if (game.isAudioEnabled) {
+            drawAudioButton(canvas, true);
+        }
         if (!game.isActive()) {
+
             drawEndGameState(canvas);
         }
-
         if (!game.canContinue()) {
             drawEndlessText(canvas);
         }
@@ -258,6 +249,7 @@ public class GameView extends View {
         createBitmapCells();
         createBackgroundBitmap(width, height);
         createOverlays();
+        createSettlementView(width,height);
     }
 
     private void drawDrawable(Canvas canvas, Drawable draw, int startingX, int startingY, int endingX, int endingY) {
@@ -285,20 +277,20 @@ public class GameView extends View {
      * @param canvas
      */
     private void drawMenuPanel(Canvas canvas) {
-        menuStartX = tableOriginalX * 2 + modePanelWidth;
-        menuEndX = tableOriginalX * 2 + modePanelWidth + scorePanelWidth;
-        menuTop = topLine + scorePanelWidth * 7 / 10;
-        menuBottom = topLine + modePanelWidth;
+        menuStartX = tableOriginalX * 2 + panelWidth;
+        menuEndX = tableOriginalX * 2 + panelWidth + panelWidth;
+        menuTop = topLine + panelWidth * 7 / 10;
+        menuBottom = topLine + panelWidth;
         menuPanelBg.setBounds(menuStartX, menuTop, menuEndX, menuBottom);
         menuPanelBg.draw(canvas);
         String str = getResources().getString(R.string.menu);
         paint.setTextSize(baseTextSize);
         float width = paint.measureText("00000000");
-        float textSize = baseTextSize * scorePanelWidth * 0.8f / Math.max(scorePanelWidth * 0.8f, width);
+        float textSize = baseTextSize * panelWidth * 0.8f / Math.max(panelWidth * 0.8f, width);
         paint.setTextSize(textSize);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(whiteTextColor);
-        canvas.drawText(str, menuStartX + scorePanelWidth / 2, menuBottom - scorePanelWidth / 10, paint);
+        canvas.drawText(str, menuStartX + panelWidth / 2, menuBottom - panelWidth / 10, paint);
     }
 
 
@@ -310,7 +302,7 @@ public class GameView extends View {
      */
     private void drawAudioButton(Canvas canvas, boolean isEnabled) {
         int functionButtonEndX = tableEndingX - (functionButtonWidth + functionButtonSpace) * 2;
-        int functionButtonBottom = topLine + modePanelWidth;
+        int functionButtonBottom = topLine + panelWidth;
         if (isEnabled) {
             enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             enableFunctionBg.draw(canvas);
@@ -329,7 +321,7 @@ public class GameView extends View {
     private void drawUndoButton(Canvas canvas, boolean isEnabled) {
 
         int functionButtonEndX = tableEndingX - functionButtonWidth - functionButtonSpace;
-        int functionButtonBottom = topLine + modePanelWidth;
+        int functionButtonBottom = topLine + panelWidth;
         if (isEnabled) {
             enableFunctionBg.setBounds(undoFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             enableFunctionBg.draw(canvas);
@@ -353,7 +345,7 @@ public class GameView extends View {
 
 
         int functionButtonEndX = tableEndingX;
-        int functionButtonBottom = topLine + modePanelWidth;
+        int functionButtonBottom = topLine + panelWidth;
         if (isEnabled) {
             enableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             enableFunctionBg.draw(canvas);
@@ -373,18 +365,18 @@ public class GameView extends View {
      * @param canvas
      */
     private void drawScorePanel(Canvas canvas) {
-        int scorePanelStartX = tableOriginalX * 2 + modePanelWidth;
-        int scorePanelEndX = tableOriginalX * 2 + modePanelWidth + scorePanelWidth;
+        int scorePanelStartX = tableOriginalX * 2 + panelWidth;
+        int scorePanelEndX = tableOriginalX * 2 + panelWidth + panelWidth;
         int scorePanelTop = topLine;
-        int scorePanelBottom = topLine + scorePanelWidth * 6 / 10;
+        int scorePanelBottom = topLine + panelWidth * 6 / 10;
         scorePanelBg.setBounds(scorePanelStartX, scorePanelTop, scorePanelEndX, scorePanelBottom);
         scorePanelBg.draw(canvas);
 
 
-        int highScorePanelStartX = 3 * tableOriginalX + modePanelWidth + scorePanelWidth;
+        int highScorePanelStartX = 3 * tableOriginalX + panelWidth + panelWidth;
         int highScorePanelEndX = tableEndingX;
         int highScorePanelTop = topLine;
-        int highScorePanelBottom = topLine + scorePanelWidth * 6 / 10;
+        int highScorePanelBottom = topLine + panelWidth * 6 / 10;
         scorePanelBg.setBounds(highScorePanelStartX, highScorePanelTop, highScorePanelEndX, highScorePanelBottom);
         scorePanelBg.draw(canvas);
         paint.setTextAlign(Paint.Align.CENTER);
@@ -393,7 +385,7 @@ public class GameView extends View {
 
 
         String scoreTitle = getResources().getString(R.string.score);
-        float scoreTitleX = scorePanelStartX + scorePanelWidth / 2;
+        float scoreTitleX = scorePanelStartX + panelWidth / 2;
         canvas.drawText(scoreTitle, scoreTitleX, scoreTitleOriginY, paint);
 
 
@@ -408,8 +400,8 @@ public class GameView extends View {
         paint.setTextSize(baseTextSize);
         float standardWidth = paint.measureText("000000");
 
-        float scoreContentSize = baseTextSize * scorePanelWidth * 0.9f / Math.max(scorePanelWidth * 0.9f, standardWidth);
-        float highScoreContentSize = baseTextSize * scorePanelWidth * 0.9f / Math.max(scorePanelWidth * 0.9f, standardWidth);
+        float scoreContentSize = baseTextSize * panelWidth * 0.9f / Math.max(panelWidth * 0.9f, standardWidth);
+        float highScoreContentSize = baseTextSize * panelWidth * 0.9f / Math.max(panelWidth * 0.9f, standardWidth);
         //draw score text
         paint.setTextSize(scoreContentSize);
         canvas.drawText(score, scoreTitleX, scoreTitleOriginY + 3 * textPaddingSize, paint);
@@ -427,7 +419,7 @@ public class GameView extends View {
      */
     private void drawModelPanel(Canvas canvas) {
 
-        modePanelBg.setBounds(tableOriginalX, topLine, tableOriginalX + modePanelWidth, topLine + modePanelWidth);
+        modePanelBg.setBounds(tableOriginalX, topLine, tableOriginalX + panelWidth, topLine + panelWidth);
         modePanelBg.draw(canvas);
 
         paint.setTextSize(baseTextSize);
@@ -435,11 +427,11 @@ public class GameView extends View {
         paint.setTextAlign(Paint.Align.LEFT);
         String str = getResources().getString(R.string.header);
         float width = paint.measureText(str);
-        float headerTextSize = 0.8f * modePanelWidth / width * baseTextSize;
+        float headerTextSize = 0.8f * panelWidth / width * baseTextSize;
         paint.setTextSize(headerTextSize);
         width = paint.measureText(str);
-        float startX = tableOriginalX + modePanelWidth / 2 - width / 2;
-        float endY = topLine + modePanelWidth / 6 - centerText() * 2 + textPaddingSize;
+        float startX = tableOriginalX + panelWidth / 2 - width / 2;
+        float endY = topLine + panelWidth / 6 - centerText() * 2 + textPaddingSize;
         canvas.drawText(str, startX, endY, paint);
     }
 
@@ -450,11 +442,11 @@ public class GameView extends View {
         paint.setColor(blackTextColor);
         String str = getResources().getString(R.string.endless);
         float width = paint.measureText(str);
-        float modeTextSize = 0.9f * modePanelWidth / width * baseTextSize;
+        float modeTextSize = 0.9f * panelWidth / width * baseTextSize;
         paint.setTextSize(modeTextSize);
         width = paint.measureText(str);
-        float startX = tableOriginalX + modePanelWidth / 2 - width / 2;
-        float endY = topLine + modePanelWidth * 2 / 3 - centerText() * 2;
+        float startX = tableOriginalX + panelWidth / 2 - width / 2;
+        float endY = topLine + panelWidth * 2 / 3 - centerText() * 2;
         canvas.drawText(str, startX, endY, paint);
     }
 
@@ -634,7 +626,7 @@ public class GameView extends View {
         drawMenuPanel(canvas);
         drawNewGameButton(canvas, true);
         drawUndoButton(canvas, false);
-        drawAudioButton(canvas, true);
+        drawAudioButton(canvas, game.isAudioEnabled);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
     }
@@ -673,6 +665,15 @@ public class GameView extends View {
             cellRectangleIds[xx] = R.drawable.cell_rectangle_4096;
         }
         return cellRectangleIds;
+    }
+
+
+    private void createSettlementView(int width, int height) {
+        Resources resources = getResources();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        loseGameOverlay = new BitmapDrawable(resources, bitmap);
+        createEndGameStates(canvas, false, false);
     }
 
     private void createOverlays() {
@@ -731,7 +732,6 @@ public class GameView extends View {
         textPaddingSize = (int) (baseTextSize / 3);
 
         bodyTextSize = (int) (baseTextSize / 1.5);
-        instructionsTextSize = (int) (baseTextSize / 1.5);
         gameOverTextSize = baseTextSize * 2;
 
         //define function button padding
@@ -751,19 +751,20 @@ public class GameView extends View {
         float a = tableOriginalY * 3 / 5;
         float b = (cellSize - gridWidth) * 8 / 5;
         // choose suitable size
-        modePanelWidth = (int) Math.max(a, b);
-        topLine = (tableOriginalY - modePanelWidth) / 4;
+//        panelWidth = (int) Math.max(a, b);
+        panelWidth = ((tableEndingX - tableOriginalX) - 2 * tableOriginalX) / 3;
+        topLine = (tableOriginalY - panelWidth) / 4;
         //calc (high)score (menu)panel width
-        scorePanelWidth = ((tableEndingX - tableOriginalX) - modePanelWidth - 4 * tableOriginalX) / 2;
-
+        panelWidth = ((tableEndingX - tableOriginalX) - panelWidth - 4 * tableOriginalX) / 2;
+        panelWidth = panelWidth;
         //calc function origin x
-        functionOriginX = 3 * tableOriginalX + modePanelWidth + scorePanelWidth;
+        functionOriginX = 3 * tableOriginalX + panelWidth + panelWidth;
         //calc function button width/height
-        functionButtonWidth = scorePanelWidth * 3 / 10;
+        functionButtonWidth = panelWidth * 3 / 10;
         //calc spacing of function button
         functionButtonSpace = ((tableEndingX - functionOriginX) - 3 * functionButtonWidth) / 2;
         //calc origin y of the  Y axis of function button
-        functionButtonTop = topLine + scorePanelWidth * 7 / 10;
+        functionButtonTop = topLine + panelWidth * 7 / 10;
         //calc origin x of the X axis of audio button
         audioFunctionStartX = functionOriginX;
         //calc origin x of the  X axis of new game button

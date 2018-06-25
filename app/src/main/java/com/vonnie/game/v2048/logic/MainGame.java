@@ -1,6 +1,7 @@
 package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.grid.AnimGrid;
 import com.vonnie.game.v2048.grid.Grid;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
+import com.vonnie.game.v2048.view.SettlementActivity;
 import com.vonnie.game.v2048.weiget.GameView;
 
 import java.io.IOException;
@@ -78,6 +80,10 @@ public class MainGame {
 
     private MediaPlayer movePlayer;
     private MediaPlayer mergePlayer;
+    /**
+     * if audio enabled or not
+     */
+    public boolean isAudioEnabled = true;
 
     public MainGame(Context context, GameView view) {
         mContext = context;
@@ -226,7 +232,9 @@ public class MainGame {
 
                         // Converge the two tiles' positions
                         tile.updatePosition(positions[1]);
-                        mergePlayer.start();
+                        if (isAudioEnabled) {
+                            mergePlayer.start();
+                        }
                         int[] extras = {xx, yy};
                         //Direction: 0 = MOVING MERGED
                         animGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
@@ -246,7 +254,9 @@ public class MainGame {
 
                     } else {
                         if (tile.getX() != positions[0].getX() || tile.getY() != positions[0].getY()) {
-                            movePlayer.start();
+                            if (isAudioEnabled) {
+                                movePlayer.start();
+                            }
                         }
                         moveTile(tile, positions[0]);
                         int[] extras = {xx, yy, 0};
@@ -283,6 +293,9 @@ public class MainGame {
             historyHighScore = currentScore;
             recordHighScore();
         }
+        Intent intent = new Intent(mContext, SettlementActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     private Cell getVector(int direction) {
@@ -386,5 +399,9 @@ public class MainGame {
 
     public boolean canContinue() {
         return !(gameState == GAME_ENDLESS || gameState == GAME_ENDLESS_WON);
+    }
+
+    public void onAudioClick() {
+        isAudioEnabled = !isAudioEnabled;
     }
 }

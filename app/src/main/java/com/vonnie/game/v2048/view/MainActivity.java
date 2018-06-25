@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferenceUtil.put(this, SpConstant.CAN_UNDO, view.game.canUndo);
         SharedPreferenceUtil.put(this, SpConstant.GAME_STATE, view.game.gameState);
         SharedPreferenceUtil.put(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
+        SharedPreferenceUtil.put(this, SpConstant.AUDIO_ENABLED, view.game.isAudioEnabled);
         Log.i("ABC", "save:view.game.gameState:" + view.game.gameState);
     }
 
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         view.game.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, view.game.canUndo);
         view.game.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, view.game.gameState);
         view.game.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, view.game.lastGameState);
+        view.game.isAudioEnabled = (boolean) SharedPreferenceUtil.get(this, SpConstant.AUDIO_ENABLED, view.game.isAudioEnabled);
         Log.i("ABC", "get:view.game.gameState:" + view.game.gameState);
     }
 

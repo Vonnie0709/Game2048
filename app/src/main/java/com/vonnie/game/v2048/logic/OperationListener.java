@@ -130,7 +130,7 @@ public class OperationListener implements View.OnTouchListener {
                     } else if (iconPressed(mView.undoFunctionStartX, mView.functionButtonTop)) {
                         mView.game.revertUndoState();
                     } else if (iconPressed(mView.audioFunctionStartX, mView.functionButtonTop)) {
-                        Log.i("ABC", "audio click");
+                        mView.game.onAudioClick();
                     } else if (iconPressed(mView.menuStartX, mView.menuTop, mView.menuEndX, mView.menuBottom)) {
                         Log.i("ABC", "menu click");
                     } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
