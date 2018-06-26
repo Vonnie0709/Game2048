@@ -2,7 +2,9 @@ package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 
 import com.vonnie.game.v2048.R;
@@ -38,8 +40,8 @@ public class GameController {
     private static final long NOTIFICATION_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME * 5;
     private static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
 
-    private static final long STARTING_MAX_VALUE = 16;
-    private static long endingMaxValue;
+    private static final int STARTING_MAX_VALUE = 16;
+    private static int endingMaxValue;
 
     public static final int GAME_WIN = 1;
     public static final int GAME_LOST = -1;
@@ -78,22 +80,22 @@ public class GameController {
 
     private GameView mView;
 
-    private MediaPlayer movePlayer;
-    private MediaPlayer mergePlayer;
+    private SoundPool soundPool;
     /**
      * if audio enabled or not
      */
     public boolean isAudioEnabled = true;
 
+    private int mergeId;
+    private int moveId;
+
     public GameController(Context context, GameView view) {
         mContext = context;
         mView = view;
-///        endingMaxValue = (int) Math.pow(2, view.numCellTypes - 1);
-        endingMaxValue = Long.MAX_VALUE;
-        Log.i("ABC", "endingMaxValue:" + endingMaxValue);
-        movePlayer = MediaPlayer.create(mContext, R.raw.move);
-        mergePlayer = MediaPlayer.create(mContext, R.raw.merge);
-
+        endingMaxValue = (int) Math.pow(2, numSquaresX * numSquaresY);
+        soundPool = new SoundPool.Builder().build();
+        mergeId = soundPool.load(context, R.raw.merge, 1);
+        moveId = soundPool.load(context, R.raw.move, 1);
     }
 
     public void newGame() {
@@ -245,7 +247,7 @@ public class GameController {
                         // Converge the two tiles' positions
                         tile.updatePosition(positions[1]);
                         if (isAudioEnabled) {
-                            mergePlayer.start();
+                            soundPool.play(mergeId, 1, 1, 1, 0, 1);
                         }
                         int[] extras = {xx, yy};
                         //Direction: 0 = MOVING MERGED
@@ -267,7 +269,7 @@ public class GameController {
                     } else {
                         if (tile.getX() != positions[0].getX() || tile.getY() != positions[0].getY()) {
                             if (isAudioEnabled) {
-                                movePlayer.start();
+                                soundPool.play(moveId, 1, 1, 1, 0, 1);
                             }
                         }
                         moveTile(tile, positions[0]);
@@ -384,7 +386,7 @@ public class GameController {
         return first.getX() == second.getX() && first.getY() == second.getY();
     }
 
-    private long winValue() {
+    private int winValue() {
         if (!canContinue()) {
             return endingMaxValue;
         } else {
