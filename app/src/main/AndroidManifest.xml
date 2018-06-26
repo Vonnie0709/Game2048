@@ -8,6 +8,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:persistent="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".view.MainActivity"
@@ -22,7 +23,9 @@
             android:name=".view.SettlementActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".view.MenuActivity" />
+        <activity
+            android:name=".view.MenuActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

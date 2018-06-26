@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 
@@ -30,6 +29,10 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!isTaskRoot()) {
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         initView(savedInstanceState);
     }
@@ -51,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         if (actionBar != null) {
             actionBar.hide();
         }
+
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -150,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         gameController.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, gameController.gameState);
         gameController.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, gameController.lastGameState);
         gameController.isAudioEnabled = (boolean) SharedPreferenceUtil.get(this, SpConstant.AUDIO_ENABLED, gameController.isAudioEnabled);
+
     }
 
     @Override
@@ -171,6 +177,23 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             } else if (resultCode == Constants.RESULT_CODE_SHARE) {
 
             }
+        } else if (requestCode == REQUEST_CODE_SETTLEMENT) {
+            if (resultCode == SettlementActivity.RESULT_CODE_ENDLESS) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+//                        gameController.setEndlessMode();
+                    }
+                });
+
+            } else if (resultCode == SettlementActivity.RESULT_CODE_NEW_GAME) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameController.newGame();
+                    }
+                });
+            }
         }
     }
 
@@ -182,12 +205,13 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onMuteButtonClick() {
-        gameController.isAudioEnabled = !gameController.isAudioEnabled;
+        gameController.mute();
+
     }
 
     @Override
     public void onUndoButtonClick() {
-        gameController.revertUndoState();
+        gameController.undoGame();
     }
 
     @Override
@@ -197,11 +221,13 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onEndOfGame() {
+        if (gameController.gameState == GameController.GAME_WIN) {
+            gameController.setEndlessMode();
+        }
         Intent intent = new Intent(this, SettlementActivity.class);
         intent.putExtra(SettlementActivity.INTENT_SCORE, gameController.currentScore);
         intent.putExtra(SettlementActivity.INTENT_GAME_STATUS, gameController.gameState);
         startActivityForResult(intent, REQUEST_CODE_SETTLEMENT);
-        Log.i("ABC", "ameController.currentScore:" + gameController.currentScore);
     }
 
 

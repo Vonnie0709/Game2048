@@ -24,4 +24,5 @@ public class SpConstant {
     public static final String GAME_STATE = "game_state";
     public static final String UNDO_GAME_STATE = "undo_game_state";
     public static final String AUDIO_ENABLED = "audio_enabled";
+    public static final String DEAL_WITH_SETTLEMENT = "deal_with_settlement";
 }

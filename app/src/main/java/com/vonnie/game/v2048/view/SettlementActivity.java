@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import static com.vonnie.game.v2048.logic.GameController.GAME_WIN;
 public class SettlementActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String INTENT_SCORE = "score";
     public static final String INTENT_GAME_STATUS = "status";
+    public static final int RESULT_CODE_ENDLESS = 1;
+    public static final int RESULT_CODE_NEW_GAME = 2;
     private TextView mGameInfo;
     private TextView mScore;
     private int gameState;
@@ -58,15 +61,31 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
             default:
                 break;
         }
+        btnContinue.setOnClickListener(this);
+        findViewById(R.id.settlement_new_game).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.settlement_game_continue:
+                setResult(RESULT_CODE_ENDLESS);
+                finish();
                 break;
+            case R.id.settlement_new_game:
+                setResult(RESULT_CODE_NEW_GAME);
+                finish();
             default:
                 break;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return false;
+        } else {
+            return super.onKeyDown(keyCode, event);
         }
     }
 }

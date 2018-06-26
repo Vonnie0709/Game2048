@@ -213,9 +213,7 @@ public class GameView extends View {
         if (gameController.canUndo) {
             drawUndoButton(canvas, true);
         }
-//        if (!gameController.isActive()) {
-//            drawEndGameState(canvas);
-//        }
+
         if (!gameController.canContinue()) {
             drawEndlessText(canvas);
         }
@@ -312,7 +310,7 @@ public class GameView extends View {
      * @param isEnabled
      */
     private void drawUndoButton(Canvas canvas, boolean isEnabled) {
-
+        Log.i("ABC", "isEnabled:" + isEnabled);
         int functionButtonEndX = tableEndingX - functionButtonWidth - functionButtonSpace;
         int functionButtonBottom = topLine + panelWidth;
         if (isEnabled) {
@@ -686,10 +684,8 @@ public class GameView extends View {
 
         paint.setTextSize(scoreTitleSize);
 
+
         // design two kind of size with mode panel
-        float a = tableOriginalY * 3 / 5;
-        float b = (cellSize - gridWidth) * 8 / 5;
-        // choose suitable size
         panelWidth = ((tableEndingX - tableOriginalX) - 2 * tableOriginalX) / 3;
         topLine = (tableOriginalY - panelWidth) / 4;
         //calc (high)score (menu)panel width

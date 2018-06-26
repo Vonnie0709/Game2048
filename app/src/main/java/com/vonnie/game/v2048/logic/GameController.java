@@ -175,7 +175,10 @@ public class GameController {
         bufferGameState = gameState;
     }
 
-    public void revertUndoState() {
+    /**
+     * undo
+     */
+    public void undoGame() {
         if (canUndo) {
             canUndo = false;
             animGrid.cancelAnimations();
@@ -185,6 +188,15 @@ public class GameController {
             mView.refreshLastTime = true;
             mView.invalidate();
         }
+    }
+
+
+    /**
+     * change mute status
+     */
+    public void mute() {
+        isAudioEnabled = !isAudioEnabled;
+        mView.invalidate();
     }
 
     public boolean gameWon() {

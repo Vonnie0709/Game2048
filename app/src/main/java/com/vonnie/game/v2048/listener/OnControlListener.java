@@ -129,8 +129,6 @@ public class OnControlListener implements View.OnTouchListener {
                         mView.gameController.onAudioClick();
                     } else if (iconPressed(mView.menuStartX, mView.menuTop, mView.menuEndX, mView.menuBottom)) {
                         mView.gameController.onMenuClick();
-                    } else if (isTap(2) && inRange(mView.tableOriginalX, x, mView.tableEndingX) && inRange(mView.tableOriginalY, x, mView.tableEndingY) && mView.continueButtonEnabled) {
-                        mView.gameController.setEndlessMode();
                     }
                 }
             default:
