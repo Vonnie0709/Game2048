@@ -264,7 +264,7 @@ public class GameView extends View {
     private String getModeText(int value) {
         int i = (int) (Math.log(value) / Math.log(2));
         if (i < modeArray.size()) {
-            return modeArray.get(i);
+            return modeArray.get(i-1);
         } else {
             return String.valueOf(value);
         }
