@@ -1,11 +1,7 @@
 package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
-import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.util.Log;
 
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.Cell;
@@ -15,7 +11,6 @@ import com.vonnie.game.v2048.grid.AnimGrid;
 import com.vonnie.game.v2048.grid.Grid;
 import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
-import com.vonnie.game.v2048.view.SettlementActivity;
 import com.vonnie.game.v2048.weiget.GameView;
 
 import java.util.ArrayList;
@@ -443,6 +438,10 @@ public class GameController {
         }
     }
 
+
+    public void setGameMode(int gameMode) {
+        mView.setGameMode(gameMode);
+    }
 
     public void setOnFunctionClickListener(OnFunctionClickListener onFunctionClickListener) {
         this.onFunctionClickListener = onFunctionClickListener;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/mode_name"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:layout_marginLeft="50dip"
+        android:layout_marginRight="50dip"
+        android:layout_marginTop="30dip"
+        android:background="@drawable/background_rectangle"
+        android:gravity="center"
+        android:text="@string/settlement_share"
+        android:textColor="@color/text_white"
+        android:textSize="25sp" />
+</RelativeLayout>

@@ -192,6 +192,11 @@ public class GameView extends View {
     private static final float MERGING_ACCELERATION = (float) -0.5;
     private static final float INITIAL_VELOCITY = (1 - MERGING_ACCELERATION) / 4;
 
+    /**
+     * mode of game
+     */
+    private int gameMode;
+
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
@@ -241,7 +246,13 @@ public class GameView extends View {
         } else {
             paint.setColor(blackTextColor);
         }
-        String str = getModeText(value);
+
+        String str;
+        if (gameMode == 0) {
+            str = String.valueOf(value);
+        } else {
+            str = getModeText(value);
+        }
         //To maintain font size, get a fixed font size
         float fitTextSize = baseTextSize * cellSize * 0.9f / Math.max(cellSize * 0.9f, paint.measureText(str));
         paint.setTextSize(fitTextSize);
@@ -252,7 +263,6 @@ public class GameView extends View {
 
     private String getModeText(int value) {
         int i = (int) (Math.log(value) / Math.log(2));
-        Log.i("ABC", "i:" + i + " - value:" + value);
         if (i < modeArray.size()) {
             return modeArray.get(i);
         } else {
@@ -564,6 +574,10 @@ public class GameView extends View {
         int[] cellRectangleIds = getCellRectangleIds();
         paint.setTextAlign(Paint.Align.CENTER);
         for (int xx = 1; xx < bitmapCell.length; xx++) {
+            if (bitmapCell[xx] != null && bitmapCell[xx].getBitmap() != null) {
+                Log.i("ABC", "in");
+                bitmapCell[xx].getBitmap().recycle();
+            }
             int value = (int) Math.pow(2, xx);
             paint.setTextSize(baseTextSize);
             Bitmap bitmap = Bitmap.createBitmap(cellSize, cellSize, Bitmap.Config.ARGB_8888);
@@ -691,8 +705,7 @@ public class GameView extends View {
         try {
 
             //Getting assets
-            String[] data = getResources().getStringArray(R.array.love_mode);
-            modeArray = Arrays.asList(data);
+            loadGameModeAssets(gameMode);
             menuPanelBg = resources.getDrawable(R.drawable.menu_background_rectangle);
             scorePanelBg = resources.getDrawable(R.drawable.score_background_rectangle);
             modePanelBg = resources.getDrawable(R.drawable.mode_background_rectangle);
@@ -714,6 +727,45 @@ public class GameView extends View {
     }
 
     public GameController gameController;
+
+    private String modeName;
+
+    private void loadGameModeAssets(int gameMode) {
+        modeArray = null;
+        String[] modes = getResources().getStringArray(R.array.mode_list);
+        String[] data = new String[]{};
+        switch (gameMode) {
+            case 0:
+                modeName = modes[0];
+                break;
+            case 1:
+                modeName = modes[1];
+                data = getResources().getStringArray(R.array.dynasty_mode);
+                break;
+            case 2:
+                modeName = modes[2];
+                data = getResources().getStringArray(R.array.love_mode);
+                break;
+            case 3:
+                modeName = modes[3];
+                data = getResources().getStringArray(R.array.immortal_mode);
+                break;
+            default:
+                modeName = modes[0];
+                break;
+        }
+        if (data.length > 0) {
+            modeArray = Arrays.asList(data);
+        }
+    }
+
+    public void setGameMode(int gameMode) {
+        this.gameMode = gameMode;
+        loadGameModeAssets(gameMode);
+        createBitmapCells();
+        Log.i("ABC", "gameMode+++++:" + gameMode);
+
+    }
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;

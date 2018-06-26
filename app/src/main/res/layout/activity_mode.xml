@@ -4,66 +4,9 @@
     android:layout_height="match_parent"
     android:background="@color/color_f9f9f0">
 
-    <TextView
-        android:id="@+id/menu_title"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mode_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text="@string/menu_title"
-        android:textColor="@color/color_7a6c68"
-        android:textSize="50sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/menu_resume"
-        android:layout_width="200dip"
-        android:layout_height="70dip"
-        android:layout_below="@+id/menu_title"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/background_rectangle"
-        android:text="@string/menu_continue"
-        android:textColor="@color/text_white"
-        android:textSize="25sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/menu_new_game"
-        android:layout_width="200dip"
-        android:layout_height="70dip"
-        android:layout_below="@+id/menu_resume"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/background_rectangle"
-        android:text="@string/menu_new_game"
-        android:textColor="@color/text_white"
-        android:textSize="25sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/menu_mode"
-        android:layout_width="200dip"
-        android:layout_height="70dip"
-        android:layout_below="@+id/menu_new_game"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/background_rectangle"
-        android:text="@string/menu_mode"
-        android:textColor="@color/text_white"
-        android:textSize="25sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/menu_share"
-        android:layout_width="200dip"
-        android:layout_height="70dip"
-        android:layout_below="@+id/menu_mode"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/background_rectangle"
-        android:text="@string/menu_share"
-        android:textColor="@color/text_white"
-        android:textSize="25sp"
-        android:textStyle="bold" />
+        android:layout_centerInParent="true" />
 </RelativeLayout>

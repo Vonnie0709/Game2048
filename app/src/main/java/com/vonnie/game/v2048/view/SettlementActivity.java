@@ -4,15 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.vonnie.game.v2048.R;
-
-import java.util.Objects;
+import com.vonnie.game.v2048.constant.Constants;
+import com.vonnie.game.v2048.constant.IntentConstant;
 
 import static com.vonnie.game.v2048.logic.GameController.GAME_ENDLESS;
 import static com.vonnie.game.v2048.logic.GameController.GAME_ENDLESS_WON;
@@ -24,10 +23,7 @@ import static com.vonnie.game.v2048.logic.GameController.GAME_WIN;
  * @date 2018/6/23
  */
 public class SettlementActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String INTENT_SCORE = "score";
-    public static final String INTENT_GAME_STATUS = "status";
-    public static final int RESULT_CODE_ENDLESS = 1;
-    public static final int RESULT_CODE_NEW_GAME = 2;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,8 +37,8 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         if (actionBar != null) {
             actionBar.hide();
         }
-        int gameState = getIntent().getIntExtra(INTENT_GAME_STATUS, 0);
-        long score = getIntent().getLongExtra(INTENT_SCORE, 0L);
+        int gameState = getIntent().getIntExtra(IntentConstant.INTENT_GAME_STATUS, 0);
+        long score = getIntent().getLongExtra(IntentConstant.INTENT_SCORE, 0L);
         TextView mGameInfo = findViewById(R.id.settlement_game_info);
         TextView mScore = findViewById(R.id.settlement_game_score);
         Button btnContinue = findViewById(R.id.settlement_game_continue);
@@ -69,11 +65,11 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.settlement_game_continue:
-                setResult(RESULT_CODE_ENDLESS);
+                setResult(Constants.RESULT_CODE_ENDLESS);
                 finish();
                 break;
             case R.id.settlement_new_game:
-                setResult(RESULT_CODE_NEW_GAME);
+                setResult(Constants.RESULT_CODE_NEW_GAME);
                 finish();
             default:
                 break;

@@ -31,22 +31,58 @@
 
     <string name="mode_title">MODE CHOOSE</string>
 
+    <array name="mode_list">
+        <item>标准版（数字2048）</item>
+        <item>朝代版</item>
+        <item>恋爱版</item>
+        <item>修仙版</item>
+    </array>
 
+
+    <array name="immortal_mode">
+        <item>后天</item>
+        <item>先天</item>
+        <item>金丹</item>
+        <item>元婴</item>
+        <item>渡劫</item>
+        <item>天仙</item>
+        <item>金仙</item>
+        <item>玄仙</item>
+        <item>天神</item>
+        <item>神王</item>
+        <item>天尊</item>
+        <item>鸿蒙掌控者</item>
+
+    </array>
     <array name="dynasty_mode">
         <item>夏朝</item>
+
         <item>商朝</item>
+
         <item>周朝</item>
+
         <item>秦朝</item>
+
         <item>汉朝</item>
+
         <item>三国</item>
+
         <item>晋朝</item>
+
         <item>隋朝</item>
+
         <item>唐朝</item>
+
         <item>宋朝</item>
+
         <item>金朝</item>
+
         <item>元朝</item>
+
         <item>明朝</item>
+
         <item>清朝</item>
+
         <item>现代</item>
     </array>
     <array name="love_mode">

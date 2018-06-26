@@ -3,12 +3,13 @@
     package="com.vonnie.game.v2048">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:persistent="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:persistent="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".view.MainActivity"
@@ -25,6 +26,9 @@
 
         <activity
             android:name=".view.MenuActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ModeActivity"
             android:screenOrientation="portrait" />
     </application>
 

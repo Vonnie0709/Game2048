@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
+import com.vonnie.game.v2048.constant.IntentConstant;
 import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.logic.GameController;
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     private GameController gameController;
     private final static int REQUEST_CODE_MENU = 0;
     private final static int REQUEST_CODE_SETTLEMENT = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,11 +179,14 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
             } else if (resultCode == Constants.RESULT_CODE_SHARE) {
 
+            } else if (resultCode == Constants.RESULT_CODE_MODE_CHOOSE) {
+                int mode = data.getIntExtra(IntentConstant.MODE_TYPE, 0);
+                gameController.setGameMode(mode);
             }
         } else if (requestCode == REQUEST_CODE_SETTLEMENT) {
-            if (resultCode == SettlementActivity.RESULT_CODE_ENDLESS) {
+            if (resultCode == Constants.RESULT_CODE_ENDLESS) {
                 //do nothing
-            } else if (resultCode == SettlementActivity.RESULT_CODE_NEW_GAME) {
+            } else if (resultCode == Constants.RESULT_CODE_NEW_GAME) {
                 new Handler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -218,8 +224,8 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             gameController.setEndlessMode();
         }
         Intent intent = new Intent(this, SettlementActivity.class);
-        intent.putExtra(SettlementActivity.INTENT_SCORE, gameController.currentScore);
-        intent.putExtra(SettlementActivity.INTENT_GAME_STATUS, gameController.gameState);
+        intent.putExtra(IntentConstant.INTENT_SCORE, gameController.currentScore);
+        intent.putExtra(IntentConstant.INTENT_GAME_STATUS, gameController.gameState);
         startActivityForResult(intent, REQUEST_CODE_SETTLEMENT);
     }
 

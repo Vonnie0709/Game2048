@@ -1,5 +1,6 @@
 package com.vonnie.game.v2048.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -44,8 +45,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.menu_mode:
-                setResult(Constants.RESULT_CODE_MODE);
-                finish();
+                Intent intent = new Intent(this, ModeActivity.class);
+                startActivityForResult(intent, 0);
                 break;
             case R.id.menu_share:
                 setResult(Constants.RESULT_CODE_SHARE);
@@ -54,5 +55,14 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            setResult(Constants.RESULT_CODE_MODE_CHOOSE, data);
+        }
+        finish();
     }
 }

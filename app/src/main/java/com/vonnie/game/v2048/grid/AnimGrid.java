@@ -12,7 +12,7 @@ public class AnimGrid {
     private ArrayList[][] field;
     private int activeAnimations = 0;
     private boolean oneMoreFrame = false;
-    public ArrayList<AnimCell> globalAnimation = new ArrayList<>();
+    private ArrayList<AnimCell> globalAnimation = new ArrayList<>();
 
     public AnimGrid(int x, int y) {
         field = new ArrayList[x][y];
