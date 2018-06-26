@@ -179,13 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             }
         } else if (requestCode == REQUEST_CODE_SETTLEMENT) {
             if (resultCode == SettlementActivity.RESULT_CODE_ENDLESS) {
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-//                        gameController.setEndlessMode();
-                    }
-                });
-
+                //do nothing
             } else if (resultCode == SettlementActivity.RESULT_CODE_NEW_GAME) {
                 new Handler().post(new Runnable() {
                     @Override
@@ -206,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     @Override
     public void onMuteButtonClick() {
         gameController.mute();
-
     }
 
     @Override

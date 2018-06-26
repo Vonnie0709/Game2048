@@ -14,6 +14,8 @@ import com.vonnie.game.v2048.R;
 
 import java.util.Objects;
 
+import static com.vonnie.game.v2048.logic.GameController.GAME_ENDLESS;
+import static com.vonnie.game.v2048.logic.GameController.GAME_ENDLESS_WON;
 import static com.vonnie.game.v2048.logic.GameController.GAME_LOST;
 import static com.vonnie.game.v2048.logic.GameController.GAME_WIN;
 
@@ -26,10 +28,6 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
     public static final String INTENT_GAME_STATUS = "status";
     public static final int RESULT_CODE_ENDLESS = 1;
     public static final int RESULT_CODE_NEW_GAME = 2;
-    private TextView mGameInfo;
-    private TextView mScore;
-    private int gameState;
-    private Button btnContinue;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,14 +41,16 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         if (actionBar != null) {
             actionBar.hide();
         }
-        gameState = getIntent().getIntExtra(INTENT_GAME_STATUS, 0);
+        int gameState = getIntent().getIntExtra(INTENT_GAME_STATUS, 0);
         long score = getIntent().getLongExtra(INTENT_SCORE, 0L);
-        mGameInfo = findViewById(R.id.settlement_game_info);
-        mScore = findViewById(R.id.settlement_game_score);
-        btnContinue = findViewById(R.id.settlement_game_continue);
+        TextView mGameInfo = findViewById(R.id.settlement_game_info);
+        TextView mScore = findViewById(R.id.settlement_game_score);
+        Button btnContinue = findViewById(R.id.settlement_game_continue);
         mScore.setText(String.valueOf(score));
         switch (gameState) {
             case GAME_WIN:
+            case GAME_ENDLESS:
+            case GAME_ENDLESS_WON:
                 mGameInfo.setText(R.string.settlement_win);
                 btnContinue.setVisibility(View.VISIBLE);
                 break;

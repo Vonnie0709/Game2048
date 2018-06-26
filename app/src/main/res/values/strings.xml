@@ -28,4 +28,41 @@
     <string name="menu_new_game">New Game</string>
     <string name="menu_share">Share</string>
     <string name="menu_mode">Mode</string>
+
+    <string name="mode_title">MODE CHOOSE</string>
+
+
+    <array name="dynasty_mode">
+        <item>夏朝</item>
+        <item>商朝</item>
+        <item>周朝</item>
+        <item>秦朝</item>
+        <item>汉朝</item>
+        <item>三国</item>
+        <item>晋朝</item>
+        <item>隋朝</item>
+        <item>唐朝</item>
+        <item>宋朝</item>
+        <item>金朝</item>
+        <item>元朝</item>
+        <item>明朝</item>
+        <item>清朝</item>
+        <item>现代</item>
+    </array>
+    <array name="love_mode">
+        <item>撩妹</item>
+        <item>暧昧</item>
+        <item>见面</item>
+        <item>心动</item>
+        <item>牵手</item>
+        <item>约会</item>
+        <item>交往</item>
+        <item>接吻</item>
+        <item>嘿咻</item>
+        <item>求婚</item>
+        <item>结婚</item>
+        <item>生子</item>
+        <item>生死契阔</item>
+        <item>与子成说</item>
+    </array>
 </resources>

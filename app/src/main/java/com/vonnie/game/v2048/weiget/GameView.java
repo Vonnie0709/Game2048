@@ -18,6 +18,9 @@ import com.vonnie.game.v2048.logic.GameController;
 import com.vonnie.game.v2048.listener.OnControlListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author LongpingZou
@@ -25,7 +28,6 @@ import java.util.ArrayList;
  */
 public class GameView extends View {
     public final int numCellTypes = 18;
-    public boolean continueButtonEnabled = false;
     private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
 
     private Drawable fadeRectangle;
@@ -184,22 +186,11 @@ public class GameView extends View {
     private float scoreTitleSize;
 
     /**
-     * text size of content ,such as 'currentScore & high currentScore'
-     */
-    private float bodyTextSize;
-
-    /**
-     * text size of  game over tips
-     */
-    private float gameOverTextSize;
-
-
-    /**
      * Internal Constants
      */
     public static final int BASE_ANIMATION_TIME = 100000000;
-    static final float MERGING_ACCELERATION = (float) -0.5;
-    static final float INITIAL_VELOCITY = (1 - MERGING_ACCELERATION) / 4;
+    private static final float MERGING_ACCELERATION = (float) -0.5;
+    private static final float INITIAL_VELOCITY = (1 - MERGING_ACCELERATION) / 4;
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -214,9 +205,9 @@ public class GameView extends View {
             drawUndoButton(canvas, true);
         }
 
-        if (!gameController.canContinue()) {
-            drawEndlessText(canvas);
-        }
+//        if (!gameController.canContinue()) {
+//            drawModeName(canvas);
+//        }
 
         //Refresh the screen if there is still an animation running
         if (gameController.animGrid.isAnimationActive()) {
@@ -250,10 +241,23 @@ public class GameView extends View {
         } else {
             paint.setColor(blackTextColor);
         }
+        String str = getModeText(value);
         //To maintain font size, get a fixed font size
-        float fitTextSize = baseTextSize * cellSize * 0.9f / Math.max(cellSize * 0.9f, paint.measureText(String.valueOf(value)));
+        float fitTextSize = baseTextSize * cellSize * 0.9f / Math.max(cellSize * 0.9f, paint.measureText(str));
         paint.setTextSize(fitTextSize);
-        canvas.drawText(String.valueOf(value), startX + cellSize / 2, startY + cellSize / 2 - textShiftY, paint);
+
+        canvas.drawText(str, startX + cellSize / 2, startY + cellSize / 2 - textShiftY, paint);
+
+    }
+
+    private String getModeText(int value) {
+        int i = (int) (Math.log(value) / Math.log(2));
+        Log.i("ABC", "i:" + i + " - value:" + value);
+        if (i < modeArray.size()) {
+            return modeArray.get(i);
+        } else {
+            return String.valueOf(value);
+        }
     }
 
 
@@ -310,7 +314,6 @@ public class GameView extends View {
      * @param isEnabled
      */
     private void drawUndoButton(Canvas canvas, boolean isEnabled) {
-        Log.i("ABC", "isEnabled:" + isEnabled);
         int functionButtonEndX = tableEndingX - functionButtonWidth - functionButtonSpace;
         int functionButtonBottom = topLine + panelWidth;
         if (isEnabled) {
@@ -427,29 +430,19 @@ public class GameView extends View {
     }
 
 
-    private void drawEndlessText(Canvas canvas) {
+    private void drawModeName(Canvas canvas, String modeName) {
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(baseTextSize);
         paint.setColor(blackTextColor);
-        String str = getResources().getString(R.string.endless);
-        float width = paint.measureText(str);
+        float width = paint.measureText(modeName);
         float modeTextSize = 0.9f * panelWidth / width * baseTextSize;
         paint.setTextSize(modeTextSize);
-        width = paint.measureText(str);
+        width = paint.measureText(modeName);
         float startX = tableOriginalX + panelWidth / 2 - width / 2;
         float endY = topLine + panelWidth * 2 / 3 - centerText() * 2;
-        canvas.drawText(str, startX, endY, paint);
+        canvas.drawText(modeName, startX, endY, paint);
     }
 
-///   private void drawInstructions(Canvas canvas) {
-//
-//        //Drawing the instructions
-//        paint.setTextSize(instructionsTextSize);
-//        paint.setTextAlign(Paint.Align.LEFT);
-//        int textShiftY = centerText() * 2;
-//        canvas.drawText(getResources().getString(R.string.instructions),
-//                tableOriginalX, tableEndingY - textShiftY + textPaddingSize, paint);
-//    }
 
     private void drawBackground(Canvas canvas) {
         Drawable backgroundRectangle = getResources().getDrawable(R.drawable.background_rectangle);
@@ -552,33 +545,6 @@ public class GameView extends View {
         }
     }
 
-//    private void drawEndGameState(Canvas canvas) {
-//        double alphaChange = 1;
-//        continueButtonEnabled = false;
-//        for (AnimCell animation : gameController.animGrid.globalAnimation) {
-//            if (animation.getAnimationType() == GameController.FADE_GLOBAL_ANIMATION) {
-//                alphaChange = animation.getPercentageDone();
-//            }
-//        }
-//        BitmapDrawable displayOverlay = null;
-//        if (gameController.gameWon()) {
-//            if (gameController.canContinue()) {
-//                continueButtonEnabled = true;
-//                displayOverlay = winGameContinueOverlay;
-//            } else {
-//                displayOverlay = winGameFinalOverlay;
-//            }
-//        } else if (gameController.gameLost()) {
-//            displayOverlay = loseGameOverlay;
-//        }
-//
-//        if (displayOverlay != null) {
-//            displayOverlay.setBounds(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
-//            displayOverlay.setAlpha((int) (255 * alphaChange));
-//            displayOverlay.draw(canvas);
-//        }
-//    }
-
 
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -668,8 +634,8 @@ public class GameView extends View {
         //define default text padding
         textPaddingSize = (int) (baseTextSize / 3);
 
-        bodyTextSize = (int) (baseTextSize / 1.5);
-        gameOverTextSize = baseTextSize * 2;
+//        bodyTextSize = (int) (baseTextSize / 1.5);
+//        gameOverTextSize = baseTextSize * 2;
 
         //define function button padding
         iconPaddingSize = (int) (baseTextSize / 5);
@@ -715,6 +681,8 @@ public class GameView extends View {
         return (int) ((paint.descent() + paint.ascent()) / 2);
     }
 
+    private List<String> modeArray;
+
     public GameView(Context context) {
         super(context);
 
@@ -723,6 +691,8 @@ public class GameView extends View {
         try {
 
             //Getting assets
+            String[] data = getResources().getStringArray(R.array.love_mode);
+            modeArray = Arrays.asList(data);
             menuPanelBg = resources.getDrawable(R.drawable.menu_background_rectangle);
             scorePanelBg = resources.getDrawable(R.drawable.score_background_rectangle);
             modePanelBg = resources.getDrawable(R.drawable.mode_background_rectangle);
