@@ -19,7 +19,6 @@ import com.vonnie.game.v2048.listener.OnControlListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -197,22 +196,18 @@ public class GameView extends View {
      */
     private int gameMode;
 
+
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
         canvas.drawBitmap(background, 0, 0, paint);
-
         drawScorePanel(canvas);
         drawCells(canvas);
         drawMuteButton(canvas, gameController.isAudioEnabled);
-
+        drawModeName(canvas);
         if (gameController.canUndo) {
             drawUndoButton(canvas, true);
         }
-
-//        if (!gameController.canContinue()) {
-//            drawModeName(canvas);
-//        }
 
         //Refresh the screen if there is still an animation running
         if (gameController.animGrid.isAnimationActive()) {
@@ -228,7 +223,7 @@ public class GameView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
-        Log.i("ABC", "onSizeChanged");
+        Log.i("ABC", "onsizeChange");
         getLayout(width, height);
         createBitmapCells();
         createBackgroundBitmap(width, height);
@@ -264,7 +259,7 @@ public class GameView extends View {
     private String getModeText(int value) {
         int i = (int) (Math.log(value) / Math.log(2));
         if (i < modeArray.size()) {
-            return modeArray.get(i-1);
+            return modeArray.get(i - 1);
         } else {
             return String.valueOf(value);
         }
@@ -421,7 +416,7 @@ public class GameView extends View {
      *
      * @param canvas
      */
-    private void drawModelPanel(Canvas canvas) {
+    private void drawModePanel(Canvas canvas) {
 
         modePanelBg.setBounds(tableOriginalX, topLine, tableOriginalX + panelWidth, topLine + panelWidth);
         modePanelBg.draw(canvas);
@@ -440,12 +435,12 @@ public class GameView extends View {
     }
 
 
-    private void drawModeName(Canvas canvas, String modeName) {
+    private void drawModeName(Canvas canvas) {
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(baseTextSize);
         paint.setColor(blackTextColor);
-        float width = paint.measureText(modeName);
-        float modeTextSize = 0.9f * panelWidth / width * baseTextSize;
+        float width = paint.measureText("000000");
+        float modeTextSize = 0.8f * panelWidth / width * baseTextSize;
         paint.setTextSize(modeTextSize);
         width = paint.measureText(modeName);
         float startX = tableOriginalX + panelWidth / 2 - width / 2;
@@ -559,24 +554,25 @@ public class GameView extends View {
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(background);
-        drawModelPanel(canvas);
+        drawModeName(canvas);
+        drawModePanel(canvas);
         drawMenuPanel(canvas);
         drawNewGameButton(canvas, true);
         drawUndoButton(canvas, false);
         drawMuteButton(canvas, gameController.isAudioEnabled);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
+
     }
 
     private void createBitmapCells() {
-
         Resources resources = getResources();
         int[] cellRectangleIds = getCellRectangleIds();
         paint.setTextAlign(Paint.Align.CENTER);
         for (int xx = 1; xx < bitmapCell.length; xx++) {
             if (bitmapCell[xx] != null && bitmapCell[xx].getBitmap() != null) {
-                Log.i("ABC", "in");
-                bitmapCell[xx].getBitmap().recycle();
+                Bitmap b = bitmapCell[xx].getBitmap();
+                b.recycle();
             }
             int value = (int) Math.pow(2, xx);
             paint.setTextSize(baseTextSize);
@@ -763,6 +759,7 @@ public class GameView extends View {
         this.gameMode = gameMode;
         loadGameModeAssets(gameMode);
         createBitmapCells();
+        invalidate();
         Log.i("ABC", "gameMode+++++:" + gameMode);
 
     }

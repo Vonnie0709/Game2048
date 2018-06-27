@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.constant.Constants;
+import com.vonnie.game.v2048.utils.ShareUtil;
 
 /**
  * @author LongpingZou
@@ -35,6 +37,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        Log.i("ABC", "click");
         switch (v.getId()) {
             case R.id.menu_resume:
                 setResult(Constants.RESULT_CODE_RESUME);
@@ -49,8 +52,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent, 0);
                 break;
             case R.id.menu_share:
-                setResult(Constants.RESULT_CODE_SHARE);
-                finish();
+                Log.i("ABC", "share");
+                ShareUtil.getInstance().showShareDialog(this);
                 break;
             default:
                 break;

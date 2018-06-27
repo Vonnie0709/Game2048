@@ -16,23 +16,25 @@
 
     <string name="share">Share</string>
 
-    <string name="settlement_score">SCORE</string>
-    <string name="settlement_continue">Continue</string>
-    <string name="settlement_share">Share</string>
-    <string name="settlement_new_game">New Game</string>
+
+    <string name="goto_share">分享至</string>
+    <string name="settlement_score">当前分数</string>
+    <string name="settlement_continue">继续游戏</string>
+    <string name="settlement_share">分享</string>
+    <string name="settlement_new_game">重新开始</string>
     <string name="settlement_win">You Win!</string>
     <string name="settlement_game_over">Game Over!</string>
 
-    <string name="menu_title">MENU</string>
-    <string name="menu_continue">Resume</string>
-    <string name="menu_new_game">New Game</string>
-    <string name="menu_share">Share</string>
-    <string name="menu_mode">Mode</string>
+    <string name="menu_title">菜单</string>
+    <string name="menu_continue">回到游戏</string>
+    <string name="menu_new_game">重新开始</string>
+    <string name="menu_share">分享</string>
+    <string name="menu_mode">模式</string>
 
-    <string name="mode_title">MODE CHOOSE</string>
+    <string name="mode_title">模式选择</string>
 
     <array name="mode_list">
-        <item>标准版（数字2048）</item>
+        <item>标准版</item>
         <item>朝代版</item>
         <item>恋爱版</item>
         <item>修仙版</item>
