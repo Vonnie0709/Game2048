@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.umeng.socialize.UMShareAPI;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.utils.ShareUtil;
@@ -63,6 +64,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == 0 && resultCode == RESULT_OK) {
             setResult(Constants.RESULT_CODE_MODE_CHOOSE, data);
         }
