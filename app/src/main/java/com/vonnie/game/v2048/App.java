@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.squareup.leakcanary.LeakCanary;
 import com.umeng.commonsdk.UMConfigure;
@@ -26,6 +27,7 @@ public class App extends Application {
     }
 
     private void initUMeng() {
+        Log.i("ABC", getChannel(getApplicationContext()));
         UMConfigure.init(this, Constants.UM_APP_KEY, getChannel(getApplicationContext()), UMConfigure.DEVICE_TYPE_PHONE, null);
 //        PlatformConfig.setWeixin("","");
 //        PlatformConfig.setSinaWeibo();
