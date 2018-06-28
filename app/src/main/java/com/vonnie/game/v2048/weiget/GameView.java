@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -20,6 +21,7 @@ import com.vonnie.game.v2048.listener.OnControlListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author LongpingZou
@@ -302,12 +304,13 @@ public class GameView extends View {
         Drawable mute;
 
         if (isEnabled) {
-            mute = getResources().getDrawable(R.drawable.icon_mute_enable);
+            mute = ContextCompat.getDrawable(context, R.drawable.icon_mute_enable);
         } else {
-            mute = getResources().getDrawable(R.drawable.icon_mute_disable);
+            mute = ContextCompat.getDrawable(context, R.drawable.icon_mute_disable);
         }
         enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
         enableFunctionBg.draw(canvas);
+        assert mute != null;
         mute.setBounds(audioFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
         mute.draw(canvas);
     }
@@ -329,7 +332,8 @@ public class GameView extends View {
             disableFunctionBg.draw(canvas);
         }
 
-        Drawable undo = getResources().getDrawable(R.drawable.ic_action_undo);
+        Drawable undo = ContextCompat.getDrawable(context, R.drawable.ic_action_undo);
+        assert undo != null;
         undo.setBounds(undoFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
         undo.draw(canvas);
     }
@@ -352,7 +356,8 @@ public class GameView extends View {
             disableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
             disableFunctionBg.draw(canvas);
         }
-        Drawable refresh = getResources().getDrawable(R.drawable.ic_action_refresh);
+        Drawable refresh = ContextCompat.getDrawable(context, R.drawable.ic_action_refresh);
+        assert refresh != null;
         refresh.setBounds(newGameFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
         refresh.draw(canvas);
     }
@@ -450,7 +455,8 @@ public class GameView extends View {
 
 
     private void drawBackground(Canvas canvas) {
-        Drawable backgroundRectangle = getResources().getDrawable(R.drawable.background_rectangle);
+        Drawable backgroundRectangle = ContextCompat.getDrawable(context, R.drawable.background_rectangle);
+        assert backgroundRectangle != null;
         drawDrawable(canvas, backgroundRectangle, tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
     }
 
@@ -459,8 +465,7 @@ public class GameView extends View {
      */
 
     private void drawBackgroundGrid(Canvas canvas) {
-        Resources resources = getResources();
-        Drawable backgroundCell = resources.getDrawable(R.drawable.cell_rectangle);
+        Drawable backgroundCell = ContextCompat.getDrawable(context, R.drawable.cell_rectangle);
         // Outputting the game grid
         for (int xx = 0; xx < gameController.numSquaresX; xx++) {
             for (int yy = 0; yy < gameController.numSquaresY; yy++) {
@@ -469,6 +474,7 @@ public class GameView extends View {
                 int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
                 int eY = sY + cellSize;
 
+                assert backgroundCell != null;
                 drawDrawable(canvas, backgroundCell, sX, sY, eX, eY);
             }
         }
@@ -578,7 +584,7 @@ public class GameView extends View {
             paint.setTextSize(baseTextSize);
             Bitmap bitmap = Bitmap.createBitmap(cellSize, cellSize, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            drawDrawable(canvas, resources.getDrawable(cellRectangleIds[xx]), 0, 0, cellSize, cellSize);
+            drawDrawable(canvas, Objects.requireNonNull(ContextCompat.getDrawable(context, cellRectangleIds[xx])), 0, 0, cellSize, cellSize);
             drawCellText(canvas, value, 0, 0);
             bitmapCell[xx] = new BitmapDrawable(resources, bitmap);
         }
@@ -692,28 +698,27 @@ public class GameView extends View {
     }
 
     private List<String> modeArray;
+    private Context context;
 
     public GameView(Context context) {
         super(context);
-
-        Resources resources = context.getResources();
-        //Loading resources
+        this.context = context;
         try {
 
             //Getting assets
             loadGameModeAssets(gameMode);
-            menuPanelBg = resources.getDrawable(R.drawable.menu_background_rectangle);
-            scorePanelBg = resources.getDrawable(R.drawable.score_background_rectangle);
-            modePanelBg = resources.getDrawable(R.drawable.mode_background_rectangle);
+            menuPanelBg = ContextCompat.getDrawable(context, R.drawable.menu_background_rectangle);
+            scorePanelBg = ContextCompat.getDrawable(context, R.drawable.score_background_rectangle);
+            modePanelBg = ContextCompat.getDrawable(context, R.drawable.mode_background_rectangle);
 
-            enableFunctionBg = resources.getDrawable(R.drawable.enable_background_retangle);
-            disableFunctionBg = resources.getDrawable(R.drawable.disable_background_retangle);
-            fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            whiteTextColor = resources.getColor(R.color.text_white);
-            blackTextColor = resources.getColor(R.color.text_black);
-            brownTextColor = resources.getColor(R.color.text_brown);
-            this.setBackgroundColor(resources.getColor(R.color.background));
-            Typeface font = Typeface.createFromAsset(resources.getAssets(), "ClearSans-Bold.ttf");
+            enableFunctionBg = ContextCompat.getDrawable(context, R.drawable.enable_background_retangle);
+            disableFunctionBg = ContextCompat.getDrawable(context, R.drawable.disable_background_retangle);
+            fadeRectangle = ContextCompat.getDrawable(context, R.drawable.fade_rectangle);
+            whiteTextColor = ContextCompat.getColor(context, R.color.text_white);
+            blackTextColor = ContextCompat.getColor(context, R.color.text_black);
+            brownTextColor = ContextCompat.getColor(context, R.color.text_brown);
+            this.setBackgroundColor(ContextCompat.getColor(context, R.color.background));
+            Typeface font = Typeface.createFromAsset(context.getResources().getAssets(), "ClearSans-Bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
             setOnTouchListener(new OnControlListener(this));

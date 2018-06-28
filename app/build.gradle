@@ -7,26 +7,64 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
-        versionName "1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        v2048 {
+            keyAlias '2048'
+            keyPassword '179511ZLP'
+            storeFile file('2048.jks')
+            storePassword '179511'
+        }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.v2048
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true     //Zipalign优化
+            minifyEnabled true
+            debuggable false
+
+        }
+        debug {
+
+            signingConfig signingConfigs.v2048
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            zipAlignEnabled true     //Zipalign优化
+            debuggable true
+
         }
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name.equalsIgnoreCase('release')) {
+                def releaseApkName = 'game_v' + defaultConfig.versionName + "_" + releaseTime() + '_release.apk'
+                outputFileName = releaseApkName
+            } else {
+                def debugApkName = 'game_v' + defaultConfig.versionName + "_" + releaseTime() + '_debug.apk'
+                outputFileName = debugApkName
+            }
+
+        }
+    }
+
+
+}
+
+static def releaseTime() {
+    return new Date().format("MMddHHmm", TimeZone.getTimeZone("UTC"))
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.yanzhenjie:permission:2.0.0-rc11'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android:1.5'
 }

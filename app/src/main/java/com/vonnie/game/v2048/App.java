@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.squareup.leakcanary.LeakCanary;
 import com.umeng.commonsdk.UMConfigure;
-import com.umeng.socialize.PlatformConfig;
 import com.vonnie.game.v2048.constant.Constants;
 
 /**

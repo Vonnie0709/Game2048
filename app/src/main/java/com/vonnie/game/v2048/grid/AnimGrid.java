@@ -8,6 +8,7 @@ import java.util.ArrayList;
  * @author LongpingZou
  * @date 2018/6/19
  */
+@SuppressWarnings("unchecked")
 public class AnimGrid {
     private ArrayList[][] field;
     private int activeAnimations = 0;
