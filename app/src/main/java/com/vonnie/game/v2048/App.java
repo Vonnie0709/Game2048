@@ -11,7 +11,7 @@ import com.umeng.commonsdk.UMConfigure;
 import com.vonnie.game.v2048.constant.Constants;
 
 /**
- * @author longp
+ * @author LongpingZou
  * @date 2018/6/26
  */
 public class App extends Application {

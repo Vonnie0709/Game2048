@@ -30,6 +30,12 @@ public class CustomBottomDialog extends Dialog {
         initView(context, layoutId);
     }
 
+    /**
+     * init Dialog View
+     *
+     * @param context
+     * @param layoutId
+     */
     private void initView(Context context, int layoutId) {
         View dialogView = LayoutInflater.from(context).inflate(layoutId, null);
         //获得dialog的window窗口

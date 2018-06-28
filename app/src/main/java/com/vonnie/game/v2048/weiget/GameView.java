@@ -28,6 +28,9 @@ import java.util.Objects;
  * @date 2018/6/19
  */
 public class GameView extends View {
+    /**
+     * define cell max number
+     */
     public final int numCellTypes = 18;
     private BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
 
@@ -231,11 +234,30 @@ public class GameView extends View {
         createBackgroundBitmap(width, height);
     }
 
+    /**
+     * draw drawable
+     *
+     * @param canvas
+     * @param draw
+     * @param startingX
+     * @param startingY
+     * @param endingX
+     * @param endingY
+     */
     private void drawDrawable(Canvas canvas, Drawable draw, int startingX, int startingY, int endingX, int endingY) {
         draw.setBounds(startingX, startingY, endingX, endingY);
         draw.draw(canvas);
     }
 
+
+    /**
+     * draw cell text
+     *
+     * @param canvas
+     * @param value
+     * @param startX
+     * @param startY
+     */
     private void drawCellText(Canvas canvas, int value, int startX, int startY) {
         int textShiftY = centerText();
         if (value >= 8) {
@@ -440,6 +462,11 @@ public class GameView extends View {
     }
 
 
+    /**
+     * draw mode name
+     *
+     * @param canvas
+     */
     private void drawModeName(Canvas canvas) {
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(baseTextSize);
@@ -454,6 +481,11 @@ public class GameView extends View {
     }
 
 
+    /**
+     * draw background
+     *
+     * @param canvas
+     */
     private void drawBackground(Canvas canvas) {
         Drawable backgroundRectangle = ContextCompat.getDrawable(context, R.drawable.background_rectangle);
         assert backgroundRectangle != null;
@@ -480,6 +512,11 @@ public class GameView extends View {
         }
     }
 
+    /**
+     * draw each cell
+     *
+     * @param canvas
+     */
     private void drawCells(Canvas canvas) {
         paint.setTextSize(baseTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
@@ -557,6 +594,12 @@ public class GameView extends View {
     }
 
 
+    /**
+     * create canvas
+     *
+     * @param width
+     * @param height
+     */
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(background);
@@ -571,6 +614,9 @@ public class GameView extends View {
 
     }
 
+    /**
+     * create  cells bg
+     */
     private void createBitmapCells() {
         Resources resources = getResources();
         int[] cellRectangleIds = getCellRectangleIds();
@@ -590,6 +636,11 @@ public class GameView extends View {
         }
     }
 
+    /**
+     * set cell rectangle assets
+     *
+     * @return
+     */
     private int[] getCellRectangleIds() {
         int[] cellRectangleIds = new int[numCellTypes];
         cellRectangleIds[0] = R.drawable.cell_rectangle;
@@ -697,7 +748,11 @@ public class GameView extends View {
         return (int) ((paint.descent() + paint.ascent()) / 2);
     }
 
+    /**
+     * define mode array to save modes
+     */
     private List<String> modeArray;
+
     private Context context;
 
     public GameView(Context context) {
@@ -727,10 +782,21 @@ public class GameView extends View {
         }
     }
 
+    /**
+     * game controller
+     */
     public GameController gameController;
 
+    /**
+     * model string name
+     */
     private String modeName;
 
+    /**
+     * here we load game assets to it's mode
+     *
+     * @param gameMode
+     */
     private void loadGameModeAssets(int gameMode) {
         modeArray = null;
         String[] modes = getResources().getStringArray(R.array.mode_list);
@@ -760,6 +826,11 @@ public class GameView extends View {
         }
     }
 
+    /**
+     * change or set game mode
+     *
+     * @param gameMode
+     */
     public void setGameMode(int gameMode) {
         this.gameMode = gameMode;
         loadGameModeAssets(gameMode);
@@ -769,6 +840,11 @@ public class GameView extends View {
 
     }
 
+    /**
+     * it's necessary  to set a game controller
+     *
+     * @param gameController
+     */
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
     }

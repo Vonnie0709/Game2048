@@ -35,7 +35,7 @@ public class GameController {
     private static final long NOTIFICATION_ANIMATION_TIME = GameView.BASE_ANIMATION_TIME * 5;
     private static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
 
-    private static final int STARTING_MAX_VALUE = 2048;
+    private static final int STARTING_MAX_VALUE = 16;
     private static int endingMaxValue;
 
     public static final int GAME_WIN = 1;

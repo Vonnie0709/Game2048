@@ -24,8 +24,19 @@ import com.vonnie.game.v2048.weiget.GameView;
 public class MainActivity extends AppCompatActivity implements OnFunctionClickListener {
 
 
+    /**
+     * define a game controller for game view
+     */
     private GameController gameController;
+
+    /**
+     * code of request for menu
+     */
     private final static int REQUEST_CODE_MENU = 0;
+
+    /**
+     * code of request settlement view
+     */
     private final static int REQUEST_CODE_SETTLEMENT = 1;
 
 
@@ -40,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         initView(savedInstanceState);
     }
 
+    /**
+     * init game view
+     *
+     * @param savedInstanceState
+     */
     private void initView(Bundle savedInstanceState) {
         GameView view = new GameView(getBaseContext());
         gameController = new GameController(this, view);
@@ -47,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         gameController.newGame();
         view.setGameController(gameController);
 
+        /**
+         * load last game data
+         */
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(SpConstant.SAVE_INSTANCE)) {
                 load();
@@ -85,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putBoolean(SpConstant.SAVE_INSTANCE, true);
+        //save game data
         save();
     }
 
@@ -94,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         save();
     }
 
+    /**
+     * to save unfinished game data
+     */
     private void save() {
         Tile[][] field = gameController.grid.field;
         Tile[][] undoField = gameController.grid.undoField;
@@ -129,6 +152,10 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         load();
     }
 
+
+    /**
+     * if have game data ,wo need load it first
+     */
     private void load() {
         //Stopping all animations
         gameController.animGrid.cancelAnimations();
