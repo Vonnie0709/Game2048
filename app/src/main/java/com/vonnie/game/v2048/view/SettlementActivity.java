@@ -46,7 +46,6 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         switch (gameState) {
             case GAME_WIN:
             case GAME_ENDLESS:
-            case GAME_ENDLESS_WON:
                 mGameInfo.setText(R.string.settlement_win);
                 btnContinue.setVisibility(View.VISIBLE);
                 break;
@@ -54,6 +53,9 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                 mGameInfo.setText(R.string.settlement_game_over);
                 btnContinue.setVisibility(View.GONE);
                 break;
+            case GAME_ENDLESS_WON:
+                mGameInfo.setText(R.string.settlement_win);
+                btnContinue.setVisibility(View.GONE);
             default:
                 break;
         }

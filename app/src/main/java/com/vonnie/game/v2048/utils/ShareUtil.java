@@ -13,6 +13,7 @@ import com.vonnie.game.v2048.weiget.CustomBottomDialog;
  */
 public class ShareUtil implements View.OnClickListener {
     private static ShareUtil shareUtil;
+    private CustomBottomDialog dialog;
 
     private ShareUtil() {
 
@@ -26,7 +27,7 @@ public class ShareUtil implements View.OnClickListener {
     }
 
     public CustomBottomDialog showShareDialog(Context context) {
-        CustomBottomDialog dialog = new CustomBottomDialog(context, R.layout.layout_share);
+        dialog = new CustomBottomDialog(context, R.layout.layout_share);
         dialog.findViewById(R.id.share_panel_close).setOnClickListener(this);
         dialog.findViewById(R.id.share_goto_kj).setOnClickListener(this);
         dialog.findViewById(R.id.share_goto_pengyouquan).setOnClickListener(this);

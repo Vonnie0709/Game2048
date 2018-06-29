@@ -12,12 +12,15 @@ import com.umeng.socialize.UMShareAPI;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.utils.ShareUtil;
+import com.vonnie.game.v2048.weiget.CustomBottomDialog;
 
 /**
  * @author LongpingZou
  * @date 2018/6/25
  */
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
+    private CustomBottomDialog shareDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +41,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Log.i("ABC", "click");
         switch (v.getId()) {
             case R.id.menu_resume:
                 setResult(Constants.RESULT_CODE_RESUME);
@@ -53,8 +55,11 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent, 0);
                 break;
             case R.id.menu_share:
-                Log.i("ABC", "share");
-                ShareUtil.getInstance().showShareDialog(this);
+                if (shareDialog == null) {
+                    shareDialog = ShareUtil.getInstance().showShareDialog(this);
+                } else {
+                    shareDialog.show();
+                }
                 break;
             default:
                 break;
@@ -70,5 +75,13 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             setResult(Constants.RESULT_CODE_MODE_CHOOSE, data);
         }
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (shareDialog != null) {
+            shareDialog.dismiss();
+        }
     }
 }
