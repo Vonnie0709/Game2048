@@ -5,18 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 
-import com.vonnie.game.v2048.App;
+import com.vonnie.game.v2048.app.GameApp;
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.constant.IntentConstant;
 import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.logic.GameController;
-import com.vonnie.game.v2048.utils.BitmapUtil;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.weiget.GameView;
 
@@ -62,8 +60,8 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         view = new GameView(getBaseContext());
         gameController = new GameController(this, view);
         gameController.setOnFunctionClickListener(this);
-        gameController.newGame();
         view.setGameController(gameController);
+        gameController.newGame();
 
         /**
          * load last game data
@@ -122,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     private void save() {
         Tile[][] field = gameController.grid.field;
         Tile[][] undoField = gameController.grid.undoField;
-        SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
-        SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
+//        SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
+//        SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
         for (int xx = 0; xx < field.length; xx++) {
             for (int yy = 0; yy < field[0].length; yy++) {
                 if (field[xx][yy] != null) {
@@ -209,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             } else if (resultCode == Constants.RESULT_CODE_SHARE) {
 
             } else if (resultCode == Constants.RESULT_CODE_MODE_CHOOSE) {
-                int mode = data.getIntExtra(IntentConstant.MODE_TYPE, 0);
+                int mode = data.getIntExtra(IntentConstant.INTENT_MODE_TYPE, 0);
                 gameController.setGameMode(mode);
             }
         } else if (requestCode == REQUEST_CODE_SETTLEMENT) {
@@ -228,9 +226,14 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onMenuButtonClick() {
+        GameApp app = GameApp.getContext();
+        app.field = gameController.grid.field;
+        app.gameMode = gameController.getGameMode();
+        app.numX = gameController.numSquaresX;
+        app.numY = gameController.numSquaresY;
+        app.score = gameController.currentScore;
         Intent intent = new Intent(this, MenuActivity.class);
         startActivityForResult(intent, REQUEST_CODE_MENU);
-        App.getContext().shareBitmap = BitmapUtil.loadBitmapFromView(view);
     }
 
     @Override
@@ -250,6 +253,12 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onEndOfGame() {
+        GameApp app = GameApp.getContext();
+        app.field = gameController.grid.field;
+        app.gameMode = gameController.getGameMode();
+        app.numX = gameController.numSquaresX;
+        app.numY = gameController.numSquaresY;
+        app.score = gameController.currentScore;
         if (gameController.gameState == GameController.GAME_WIN) {
             gameController.setEndlessMode();
         }
@@ -261,14 +270,11 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onRecordHighScore() {
-        Log.i("ABC", "save -high");
         saveHighScoreView();
     }
 
     private void saveHighScoreView() {
         Tile[][] field = gameController.grid.field;
-        SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
-        SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
         for (int xx = 0; xx < field.length; xx++) {
             for (int yy = 0; yy < field[0].length; yy++) {
                 if (field[xx][yy] != null) {

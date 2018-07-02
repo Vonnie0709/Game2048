@@ -1,25 +1,27 @@
-package com.vonnie.game.v2048;
+package com.vonnie.game.v2048.app;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.squareup.leakcanary.LeakCanary;
 import com.umeng.commonsdk.UMConfigure;
-import com.umeng.socialize.Config;
 import com.umeng.socialize.PlatformConfig;
+import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
 
 /**
  * @author LongpingZou
  * @date 2018/6/26
  */
-public class App extends Application {
-    public Bitmap shareBitmap;
-    private static App instance;
+public class GameApp extends Application {
+    private static GameApp instance;
+    public Tile[][] field;
+    public int gameMode;
+    public int numX;
+    public int numY;
+    public int score;
 
     @Override
     public void onCreate() {
@@ -32,7 +34,7 @@ public class App extends Application {
         initUMeng();
     }
 
-    public static App getContext() {
+    public static GameApp getContext() {
         return instance;
     }
 

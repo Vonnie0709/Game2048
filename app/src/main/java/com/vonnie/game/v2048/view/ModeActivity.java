@@ -12,7 +12,6 @@ import android.view.View;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.adapter.ModeAdapter;
-import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.constant.IntentConstant;
 
 import java.util.Arrays;
@@ -46,7 +45,7 @@ public class ModeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent();
-                intent.putExtra(IntentConstant.MODE_TYPE, position);
+                intent.putExtra(IntentConstant.INTENT_MODE_TYPE, position);
                 setResult(RESULT_OK, intent);
                 finish();
             }

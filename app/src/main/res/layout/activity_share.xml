@@ -5,22 +5,25 @@
     android:orientation="vertical">
 
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/game_container"
         android:layout_width="match_parent"
-        android:background="@color/colorAccent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="@color/color_f8faef"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="220dip"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dip"
+            android:layout_marginBottom="40dip"
+            android:layout_marginTop="40dip"
             android:background="@drawable/share_score_background_rectangle"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/share_score_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
@@ -30,6 +33,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/share_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dip"
@@ -39,16 +43,28 @@
                 android:textSize="26sp"
                 android:textStyle="bold" />
         </LinearLayout>
-    </FrameLayout>
+
+        <TextView
+            android:id="@+id/share_declaration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dip"
+            android:gravity="center"
+            android:text="@string/share_high_score_tips"
+            android:textColor="@color/color_bbada0"
+            android:textSize="20sp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/share_commit"
-        android:layout_width="200dip"
-        android:layout_height="70dip"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dip"
-        android:layout_marginTop="30dip"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="30dip"
+        android:layout_marginRight="30dip"
+        android:layout_marginTop="10dip"
         android:background="@drawable/background_rectangle"
         android:text="@string/menu_share"
         android:textColor="@color/text_white"

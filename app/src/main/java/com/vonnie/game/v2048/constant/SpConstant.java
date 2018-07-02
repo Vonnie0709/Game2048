@@ -14,8 +14,6 @@ public class SpConstant {
      */
     public final static String HIGH_SCORE = "high_score";
 
-    public static final String WIDTH = "width";
-    public static final String HEIGHT = "height";
     public static final String SCORE = "currentScore";
     public static final String HIGH_SCORE_TEMP = "high_score_temp";
     public static final String UNDO_SCORE = "undo_score";

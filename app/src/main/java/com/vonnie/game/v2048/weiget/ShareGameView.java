@@ -215,10 +215,16 @@ public class ShareGameView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
-        getLayout(width * 4 / 5, height * 4 / 5);
-        createBackgroundBitmap(width * 4 / 5, height * 4 / 5);
+//        int resizeWidth = width * 4 / 5;
+//        int resizeHeight = height * 3 / 5;
+//        getLayout(resizeWidth, resizeHeight, width, height);
+//        createBackgroundBitmap(resizeWidth, resizeHeight);
+        Log.e("ABC", "width:" + width + " - height" + height);
+        getLayout(width, height);
+        createBackgroundBitmap(width, height);
         createBitmapCells();
     }
+
 
     /**
      * draw drawable
@@ -462,16 +468,13 @@ public class ShareGameView extends View {
 
     private void getLayout(int width, int height) {
         //considering rotating screen ,numSquaresY need to add 3 points
-        cellSize = Math.min(width / (numSquaresX + 1), height / (numSquaresY + 3));
+        cellSize = width / (numSquaresX + 1);
         Log.i("ABC", "cellSize:" + cellSize);
         //calc width of grid spacing
         gridWidth = cellSize / (numSquaresX + 3);
 
         int screenMiddleX = width / 2;
         int screenMiddleY = height / 2;
-        int boardMiddleX = screenMiddleX;
-        //move table down twice cell size
-        int boardMiddleY = screenMiddleY + cellSize / 2;
 
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(cellSize);
@@ -483,21 +486,16 @@ public class ShareGameView extends View {
         //define default text padding
         textPaddingSize = (int) (baseTextSize / 3);
 
-//        bodyTextSize = (int) (baseTextSize / 1.5);
-//        gameOverTextSize = baseTextSize * 2;
-
         //define function button padding
         iconPaddingSize = (int) (baseTextSize / 5);
 
         double halfNumSquaresX = numSquaresX / 2d;
         double halfNumSquaresY = numSquaresY / 2d;
 
-        tableOriginalX = (int) (boardMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
-        tableEndingX = (int) (boardMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
-        tableOriginalY = (int) (boardMiddleY - (cellSize + gridWidth) * halfNumSquaresY - gridWidth / 2);
-        tableEndingY = (int) (boardMiddleY + (cellSize + gridWidth) * halfNumSquaresY + gridWidth / 2);
-
-        paint.setTextSize(scoreTitleSize);
+        tableOriginalX = (int) (screenMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
+        tableEndingX = (int) (screenMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
+        tableOriginalY = (int) (screenMiddleY - (cellSize + gridWidth) * halfNumSquaresY - gridWidth / 2);
+        tableEndingY = (int) (screenMiddleY + (cellSize + gridWidth) * halfNumSquaresY + gridWidth / 2);
 
 
         // design two kind of size with mode panel
@@ -543,6 +541,7 @@ public class ShareGameView extends View {
         this.context = context;
         this.numSquaresX = numSquaresX;
         this.numSquaresY = numSquaresY;
+        this.gameMode = mode;
         try {
 
             //Getting assets
@@ -596,5 +595,11 @@ public class ShareGameView extends View {
         }
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int size = (int) (MeasureSpec.getSize(widthMeasureSpec) * 0.8);
+        setMeasuredDimension(size, size);
+    }
 
 }

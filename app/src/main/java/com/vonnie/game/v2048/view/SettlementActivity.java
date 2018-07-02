@@ -1,5 +1,6 @@
 package com.vonnie.game.v2048.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -38,7 +39,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
             actionBar.hide();
         }
         int gameState = getIntent().getIntExtra(IntentConstant.INTENT_GAME_STATUS, 0);
-        long score = getIntent().getLongExtra(IntentConstant.INTENT_SCORE, 0L);
+        int score = getIntent().getIntExtra(IntentConstant.INTENT_SCORE, 0);
         TextView mGameInfo = findViewById(R.id.settlement_game_info);
         TextView mScore = findViewById(R.id.settlement_game_score);
         Button btnContinue = findViewById(R.id.settlement_game_continue);
@@ -61,10 +62,12 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         }
         btnContinue.setOnClickListener(this);
         findViewById(R.id.settlement_new_game).setOnClickListener(this);
+        findViewById(R.id.settlement_game_share).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()) {
             case R.id.settlement_game_continue:
                 setResult(Constants.RESULT_CODE_ENDLESS);
@@ -73,6 +76,12 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
             case R.id.settlement_new_game:
                 setResult(Constants.RESULT_CODE_NEW_GAME);
                 finish();
+                break;
+            case R.id.settlement_game_share:
+                intent = new Intent(SettlementActivity.this, ShareActivity.class);
+                intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 3);
+                startActivity(intent);
+                break;
             default:
                 break;
         }

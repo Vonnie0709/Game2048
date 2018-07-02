@@ -7,20 +7,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
-import com.umeng.socialize.UMShareListener;
-import com.umeng.socialize.bean.SHARE_MEDIA;
-import com.umeng.socialize.media.UMImage;
-import com.vonnie.game.v2048.App;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.constant.Constants;
+import com.vonnie.game.v2048.constant.IntentConstant;
 import com.vonnie.game.v2048.constant.SpConstant;
-import com.vonnie.game.v2048.listener.ShareListener;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
-import com.vonnie.game.v2048.weiget.CustomBottomDialog;
 
 /**
  * @author LongpingZou
@@ -73,11 +66,15 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent, 0);
                 break;
             case R.id.menu_share:
-                UMImage umImage = new UMImage(this, App.getContext().shareBitmap);
-                new ShareAction(this).withText(getString(R.string.share_normal_tips)).withMedia(umImage).setDisplayList(SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE).setCallback(new ShareListener()).open();
+                intent = new Intent(MenuActivity.this, ShareActivity.class);
+                //normal share
+                intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 0);
+                startActivity(intent);
                 break;
             case R.id.menu_high_score:
+                //high score share
                 intent = new Intent(MenuActivity.this, ShareActivity.class);
+                intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 1);
                 startActivity(intent);
                 break;
             default:
