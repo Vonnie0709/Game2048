@@ -21,6 +21,7 @@
     <string name="menu_continue">回到游戏</string>
     <string name="menu_new_game">重新开始</string>
     <string name="menu_share">分享</string>
+    <string name="menu_high_score">最高得分</string>
     <string name="menu_mode">模式</string>
 
     <string name="mode_title">模式选择</string>
@@ -95,4 +96,8 @@
         <item>生死契阔</item>
         <item>与子成说</item>
     </array>
+
+    <string name="share_history_high_score">历史最高成绩</string>
+    <string name="share_normal_tips">傻子，要不要一起来玩玩</string>
+    <string name="share_high_score_tips">来啊，挑战我的最高战绩\n----《2048多玩版》</string>
 </resources>

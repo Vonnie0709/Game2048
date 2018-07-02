@@ -24,5 +24,7 @@ public class SpConstant {
     public static final String GAME_STATE = "game_state";
     public static final String UNDO_GAME_STATE = "undo_game_state";
     public static final String AUDIO_ENABLED = "audio_enabled";
-    public static final String DEAL_WITH_SETTLEMENT = "deal_with_settlement";
+    public static final String HIGH_SCORE_MODE = "high_score_mode";
+    public static final String HIGH_SCORE_X_NUM = "high_score_x_num";
+    public static final String HIGH_SCORE_Y_NUM = "high_score_y_num";
 }

@@ -9,6 +9,7 @@
     <color name="background">#faf8ef</color>
     <color name="color_edc613">#edc613</color>
     <color name="color_ed995b">#ed995b</color>
+    <color name="color_ed9A5b">#ed9A5b</color>
     <color name="color_bbada0">#bbada0</color>
     <color name="color_f9f9f0">#f9f9f0</color>
     <color name="color_7a6c68">#7a6c68</color>
@@ -41,4 +42,5 @@
     <color name="color_5fdb93">#5fdb93</color>
     <color name="color_FFF63B3B">#FFF63B3B</color>
     <color name="color_FFF63BEA">#FFF63BEA</color>
+    <color name="color_efe4d5">#efe4d5</color>
 </resources>

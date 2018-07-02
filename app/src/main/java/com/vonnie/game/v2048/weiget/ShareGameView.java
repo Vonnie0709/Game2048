@@ -9,14 +9,16 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.AnimCell;
 import com.vonnie.game.v2048.cell.Tile;
+import com.vonnie.game.v2048.grid.AnimGrid;
+import com.vonnie.game.v2048.grid.Grid;
 import com.vonnie.game.v2048.logic.GameController;
-import com.vonnie.game.v2048.listener.OnControlListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,7 @@ import java.util.Objects;
  * @author LongpingZou
  * @date 2018/6/19
  */
-public class GameView extends View {
+public class ShareGameView extends View {
     /**
      * define cell max number
      */
@@ -36,8 +38,6 @@ public class GameView extends View {
 
     private Bitmap background = null;
     long lastFPSTime = System.nanoTime();
-    long currentTime = System.nanoTime();
-    public boolean refreshLastTime = true;
     /**
      * paint
      */
@@ -199,38 +199,25 @@ public class GameView extends View {
      * mode of game
      */
     private int gameMode;
-
+    public Grid grid = null;
+    public AnimGrid animGrid = null;
+    public int numSquaresX;
+    public int numSquaresY;
 
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
         canvas.drawBitmap(background, 0, 0, paint);
-        drawScorePanel(canvas);
         drawCells(canvas);
-        drawMuteButton(canvas, gameController.isAudioEnabled);
-        drawModeName(canvas);
-        if (gameController.canUndo) {
-            drawUndoButton(canvas, true);
-        }
 
-        //Refresh the screen if there is still an animation running
-        if (gameController.animGrid.isAnimationActive()) {
-            invalidate(tableOriginalX, tableOriginalY, tableEndingX, tableEndingY);
-            tick();
-            //Refresh one last time on game end.
-        } else if (!gameController.isActive() && refreshLastTime) {
-            invalidate();
-            refreshLastTime = false;
-        }
     }
 
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
-        Log.i("ABC", "onsizeChange");
-        getLayout(width, height);
+        getLayout(width * 4 / 5, height * 4 / 5);
+        createBackgroundBitmap(width * 4 / 5, height * 4 / 5);
         createBitmapCells();
-        createBackgroundBitmap(width, height);
     }
 
     /**
@@ -290,197 +277,6 @@ public class GameView extends View {
 
 
     /**
-     * draw function menu panel
-     *
-     * @param canvas
-     */
-    private void drawMenuPanel(Canvas canvas) {
-        menuStartX = tableOriginalX * 2 + panelWidth;
-        menuEndX = tableOriginalX * 2 + panelWidth + panelWidth;
-        menuTop = topLine + panelWidth * 7 / 10;
-        menuBottom = topLine + panelWidth;
-        menuPanelBg.setBounds(menuStartX, menuTop, menuEndX, menuBottom);
-        menuPanelBg.draw(canvas);
-        String str = getResources().getString(R.string.menu);
-        paint.setTextSize(baseTextSize);
-        float width = paint.measureText("00000000");
-        float textSize = baseTextSize * panelWidth * 0.8f / Math.max(panelWidth * 0.8f, width);
-        paint.setTextSize(textSize);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setColor(whiteTextColor);
-        canvas.drawText(str, menuStartX + panelWidth / 2, menuBottom - panelWidth / 10, paint);
-    }
-
-
-    /**
-     * draw audio button
-     *
-     * @param canvas
-     * @param isEnabled
-     */
-    private void drawMuteButton(Canvas canvas, boolean isEnabled) {
-        int functionButtonEndX = tableEndingX - (functionButtonWidth + functionButtonSpace) * 2;
-        int functionButtonBottom = topLine + panelWidth;
-
-        Drawable mute;
-
-        if (isEnabled) {
-            mute = ContextCompat.getDrawable(context, R.drawable.icon_mute_enable);
-        } else {
-            mute = ContextCompat.getDrawable(context, R.drawable.icon_mute_disable);
-        }
-        enableFunctionBg.setBounds(audioFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-        enableFunctionBg.draw(canvas);
-        assert mute != null;
-        mute.setBounds(audioFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
-        mute.draw(canvas);
-    }
-
-    /**
-     * draw undo game button
-     *
-     * @param canvas
-     * @param isEnabled
-     */
-    private void drawUndoButton(Canvas canvas, boolean isEnabled) {
-        int functionButtonEndX = tableEndingX - functionButtonWidth - functionButtonSpace;
-        int functionButtonBottom = topLine + panelWidth;
-        if (isEnabled) {
-            enableFunctionBg.setBounds(undoFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            enableFunctionBg.draw(canvas);
-        } else {
-            disableFunctionBg.setBounds(undoFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            disableFunctionBg.draw(canvas);
-        }
-
-        Drawable undo = ContextCompat.getDrawable(context, R.drawable.ic_action_undo);
-        assert undo != null;
-        undo.setBounds(undoFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
-        undo.draw(canvas);
-    }
-
-    /**
-     * draw new game button
-     *
-     * @param canvas
-     * @param isEnabled
-     */
-    private void drawNewGameButton(Canvas canvas, boolean isEnabled) {
-
-
-        int functionButtonEndX = tableEndingX;
-        int functionButtonBottom = topLine + panelWidth;
-        if (isEnabled) {
-            enableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            enableFunctionBg.draw(canvas);
-        } else {
-            disableFunctionBg.setBounds(newGameFunctionStartX, functionButtonTop, functionButtonEndX, functionButtonBottom);
-            disableFunctionBg.draw(canvas);
-        }
-        Drawable refresh = ContextCompat.getDrawable(context, R.drawable.ic_action_refresh);
-        assert refresh != null;
-        refresh.setBounds(newGameFunctionStartX + iconPaddingSize, functionButtonTop + iconPaddingSize, functionButtonEndX - iconPaddingSize, functionButtonBottom - iconPaddingSize);
-        refresh.draw(canvas);
-    }
-
-
-    /**
-     * draw the high score panel
-     *
-     * @param canvas
-     */
-    private void drawScorePanel(Canvas canvas) {
-        int scorePanelStartX = tableOriginalX * 2 + panelWidth;
-        int scorePanelEndX = tableOriginalX * 2 + panelWidth + panelWidth;
-        int scorePanelTop = topLine;
-        int scorePanelBottom = topLine + panelWidth * 6 / 10;
-        scorePanelBg.setBounds(scorePanelStartX, scorePanelTop, scorePanelEndX, scorePanelBottom);
-        scorePanelBg.draw(canvas);
-
-
-        int highScorePanelStartX = 3 * tableOriginalX + panelWidth + panelWidth;
-        int highScorePanelEndX = tableEndingX;
-        int highScorePanelTop = topLine;
-        int highScorePanelBottom = topLine + panelWidth * 6 / 10;
-        scorePanelBg.setBounds(highScorePanelStartX, highScorePanelTop, highScorePanelEndX, highScorePanelBottom);
-        scorePanelBg.draw(canvas);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(scoreTitleSize);
-        paint.setColor(brownTextColor);
-
-
-        String scoreTitle = getResources().getString(R.string.score);
-        float scoreTitleX = scorePanelStartX + panelWidth / 2;
-        canvas.drawText(scoreTitle, scoreTitleX, scoreTitleOriginY, paint);
-
-
-        String highScoreTitle = getResources().getString(R.string.high_score);
-        float highScoreTitleX = tableEndingX - (tableEndingX - highScorePanelStartX) / 2;
-        canvas.drawText(highScoreTitle, highScoreTitleX, scoreTitleOriginY, paint);
-
-
-        String score = String.valueOf(gameController.currentScore);
-        String highScore = String.valueOf(gameController.historyHighScore);
-        paint.setColor(whiteTextColor);
-        paint.setTextSize(baseTextSize);
-        float standardWidth = paint.measureText("000000");
-
-        float scoreContentSize = baseTextSize * panelWidth * 0.9f / Math.max(panelWidth * 0.9f, standardWidth);
-        float highScoreContentSize = baseTextSize * panelWidth * 0.9f / Math.max(panelWidth * 0.9f, standardWidth);
-        //draw score text
-        paint.setTextSize(scoreContentSize);
-        canvas.drawText(score, scoreTitleX, scoreTitleOriginY + 3 * textPaddingSize, paint);
-        //draw high score text
-        paint.setTextSize(highScoreContentSize);
-        canvas.drawText(highScore, highScoreTitleX, scoreTitleOriginY + 3 * textPaddingSize, paint);
-
-    }
-
-
-    /**
-     * draw mode panel
-     *
-     * @param canvas
-     */
-    private void drawModePanel(Canvas canvas) {
-
-        modePanelBg.setBounds(tableOriginalX, topLine, tableOriginalX + panelWidth, topLine + panelWidth);
-        modePanelBg.draw(canvas);
-
-        paint.setTextSize(baseTextSize);
-        paint.setColor(whiteTextColor);
-        paint.setTextAlign(Paint.Align.LEFT);
-        String str = getResources().getString(R.string.header);
-        float width = paint.measureText(str);
-        float headerTextSize = 0.8f * panelWidth / width * baseTextSize;
-        paint.setTextSize(headerTextSize);
-        width = paint.measureText(str);
-        float startX = tableOriginalX + panelWidth / 2 - width / 2;
-        float endY = topLine + panelWidth / 6 - centerText() * 2 + textPaddingSize;
-        canvas.drawText(str, startX, endY, paint);
-    }
-
-
-    /**
-     * draw mode name
-     *
-     * @param canvas
-     */
-    private void drawModeName(Canvas canvas) {
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTextSize(baseTextSize);
-        paint.setColor(blackTextColor);
-        float width = paint.measureText("000000");
-        float modeTextSize = 0.8f * panelWidth / width * baseTextSize;
-        paint.setTextSize(modeTextSize);
-        width = paint.measureText(modeName);
-        float startX = tableOriginalX + panelWidth / 2 - width / 2;
-        float endY = topLine + panelWidth * 2 / 3 - centerText() * 2;
-        canvas.drawText(modeName, startX, endY, paint);
-    }
-
-
-    /**
      * draw background
      *
      * @param canvas
@@ -498,8 +294,8 @@ public class GameView extends View {
     private void drawBackgroundGrid(Canvas canvas) {
         Drawable backgroundCell = ContextCompat.getDrawable(context, R.drawable.cell_rectangle);
         // Outputting the game grid
-        for (int xx = 0; xx < gameController.numSquaresX; xx++) {
-            for (int yy = 0; yy < gameController.numSquaresY; yy++) {
+        for (int xx = 0; xx < numSquaresX; xx++) {
+            for (int yy = 0; yy < numSquaresY; yy++) {
                 int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
                 int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
@@ -520,28 +316,25 @@ public class GameView extends View {
         paint.setTextSize(baseTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
         // Outputting the individual cells
-        for (int xx = 0; xx < gameController.numSquaresX; xx++) {
-            for (int yy = 0; yy < gameController.numSquaresY; yy++) {
+        for (int xx = 0; xx < numSquaresX; xx++) {
+            for (int yy = 0; yy < numSquaresY; yy++) {
                 int sX = tableOriginalX + gridWidth + (cellSize + gridWidth) * xx;
                 int eX = sX + cellSize;
                 int sY = tableOriginalY + gridWidth + (cellSize + gridWidth) * yy;
                 int eY = sY + cellSize;
 
-                Tile currentTile = gameController.grid.getCellContent(xx, yy);
+                Tile currentTile = grid.getCellContent(xx, yy);
                 if (currentTile != null) {
                     //Get and represent the value of the tile
                     int value = currentTile.getValue();
                     int index = log2(value);
 
                     //Check for any active animations
-                    ArrayList<AnimCell> aArray = gameController.animGrid.getAnimCell(xx, yy);
+                    ArrayList<AnimCell> aArray = animGrid.getAnimCell(xx, yy);
                     boolean animated = false;
                     for (int i = aArray.size() - 1; i >= 0; i--) {
                         AnimCell aCell = aArray.get(i);
-                        //If this animation is not active, skip it
-                        if (aCell.getAnimationType() == GameController.SPAWN_ANIMATION) {
-                            animated = true;
-                        }
+
                         if (!aCell.isActive()) {
                             continue;
                         }
@@ -602,12 +395,6 @@ public class GameView extends View {
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(background);
-        drawModeName(canvas);
-        drawModePanel(canvas);
-        drawMenuPanel(canvas);
-        drawNewGameButton(canvas, true);
-        drawUndoButton(canvas, false);
-        drawMuteButton(canvas, gameController.isAudioEnabled);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
 
@@ -617,6 +404,7 @@ public class GameView extends View {
      * create  cells bg
      */
     private void createBitmapCells() {
+        Log.i("ABC", "cell:" + cellSize);
         Resources resources = getResources();
         int[] cellRectangleIds = getCellRectangleIds();
         paint.setTextAlign(Paint.Align.CENTER);
@@ -661,12 +449,6 @@ public class GameView extends View {
     }
 
 
-    private void tick() {
-        currentTime = System.nanoTime();
-        gameController.animGrid.tickAll(currentTime - lastFPSTime);
-        lastFPSTime = currentTime;
-    }
-
     public void syncTime() {
         lastFPSTime = System.nanoTime();
     }
@@ -680,9 +462,10 @@ public class GameView extends View {
 
     private void getLayout(int width, int height) {
         //considering rotating screen ,numSquaresY need to add 3 points
-        cellSize = Math.min(width / (gameController.numSquaresX + 1), height / (gameController.numSquaresY + 3));
+        cellSize = Math.min(width / (numSquaresX + 1), height / (numSquaresY + 3));
+        Log.i("ABC", "cellSize:" + cellSize);
         //calc width of grid spacing
-        gridWidth = cellSize / (gameController.numSquaresX + 3);
+        gridWidth = cellSize / (numSquaresX + 3);
 
         int screenMiddleX = width / 2;
         int screenMiddleY = height / 2;
@@ -706,8 +489,8 @@ public class GameView extends View {
         //define function button padding
         iconPaddingSize = (int) (baseTextSize / 5);
 
-        double halfNumSquaresX = gameController.numSquaresX / 2d;
-        double halfNumSquaresY = gameController.numSquaresY / 2d;
+        double halfNumSquaresX = numSquaresX / 2d;
+        double halfNumSquaresY = numSquaresY / 2d;
 
         tableOriginalX = (int) (boardMiddleX - (cellSize + gridWidth) * halfNumSquaresX - gridWidth / 2);
         tableEndingX = (int) (boardMiddleX + (cellSize + gridWidth) * halfNumSquaresX + gridWidth / 2);
@@ -754,13 +537,18 @@ public class GameView extends View {
 
     private Context context;
 
-    public GameView(Context context) {
+
+    public ShareGameView(Context context, int numSquaresX, int numSquaresY, int mode) {
         super(context);
         this.context = context;
+        this.numSquaresX = numSquaresX;
+        this.numSquaresY = numSquaresY;
         try {
 
             //Getting assets
-            loadGameModeAssets(gameMode);
+            loadGameModeAssets(mode);
+            grid = new Grid(numSquaresX, numSquaresY);
+            animGrid = new AnimGrid(numSquaresX, numSquaresY);
             menuPanelBg = ContextCompat.getDrawable(context, R.drawable.menu_background_rectangle);
             scorePanelBg = ContextCompat.getDrawable(context, R.drawable.score_background_rectangle);
             modePanelBg = ContextCompat.getDrawable(context, R.drawable.mode_background_rectangle);
@@ -774,21 +562,11 @@ public class GameView extends View {
             Typeface font = Typeface.createFromAsset(context.getResources().getAssets(), "ClearSans-Bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
-            setOnTouchListener(new OnControlListener(this));
         } catch (Exception e) {
             System.out.println("Error getting assets?");
         }
     }
 
-    /**
-     * game controller
-     */
-    public GameController gameController;
-
-    /**
-     * model string name
-     */
-    private String modeName;
 
     /**
      * here we load game assets to it's mode
@@ -797,26 +575,20 @@ public class GameView extends View {
      */
     private void loadGameModeAssets(int gameMode) {
         modeArray = null;
-        String[] modes = getResources().getStringArray(R.array.mode_list);
         String[] data = new String[]{};
         switch (gameMode) {
             case 0:
-                modeName = modes[0];
                 break;
             case 1:
-                modeName = modes[1];
                 data = getResources().getStringArray(R.array.dynasty_mode);
                 break;
             case 2:
-                modeName = modes[2];
                 data = getResources().getStringArray(R.array.love_mode);
                 break;
             case 3:
-                modeName = modes[3];
                 data = getResources().getStringArray(R.array.immortal_mode);
                 break;
             default:
-                modeName = modes[0];
                 break;
         }
         if (data.length > 0) {
@@ -824,36 +596,5 @@ public class GameView extends View {
         }
     }
 
-    /**
-     * change or set game mode
-     *
-     * @param gameMode
-     */
-    public void setGameMode(int gameMode) {
-        this.gameMode = gameMode;
-        loadGameModeAssets(gameMode);
-        createBitmapCells();
-        invalidate();
-        Log.i("ABC", "gameMode+++++:" + gameMode);
-
-    }
-
-    /**
-     * getter of getting game mode
-     *
-     * @return
-     */
-    public int getGameMode() {
-        return gameMode;
-    }
-
-    /**
-     * it's necessary  to set a game controller
-     *
-     * @param gameController
-     */
-    public void setGameController(GameController gameController) {
-        this.gameController = gameController;
-    }
 
 }

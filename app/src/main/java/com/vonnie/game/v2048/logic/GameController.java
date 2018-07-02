@@ -63,13 +63,13 @@ public class GameController {
     /**
      * Current score
      */
-    public long currentScore = 0;
-    public long historyHighScore = 0;
+    public int currentScore = 0;
+    public int historyHighScore = 0;
 
-    public long lastScore = 0;
+    public int lastScore = 0;
     public int lastGameState = 0;
 
-    private long bufferScore = 0;
+    private int bufferScore = 0;
     private int bufferGameState = 0;
 
     private Context mContext;
@@ -95,6 +95,12 @@ public class GameController {
     }
 
     public void newGame() {
+        historyHighScore = getHistoryHighScore();
+        if (currentScore >= historyHighScore) {
+            historyHighScore = currentScore;
+            recordHighScore();
+        }
+        currentScore = 0;
         if (grid == null) {
             grid = new Grid(numSquaresX, numSquaresY);
         } else {
@@ -103,12 +109,6 @@ public class GameController {
             grid.clearGrid();
         }
         animGrid = new AnimGrid(numSquaresX, numSquaresY);
-        historyHighScore = getHistoryHighScore();
-        if (currentScore >= historyHighScore) {
-            historyHighScore = currentScore;
-            recordHighScore();
-        }
-        currentScore = 0;
         gameState = GAME_NORMAL;
         addStartTiles();
         canUndo = false;
@@ -138,10 +138,11 @@ public class GameController {
 
     private void recordHighScore() {
         SharedPreferenceUtil.put(mContext, SpConstant.HIGH_SCORE, historyHighScore);
+        onRecordHighScore();
     }
 
-    private long getHistoryHighScore() {
-        return (long) SharedPreferenceUtil.get(mContext, SpConstant.HIGH_SCORE, -1L);
+    private int getHistoryHighScore() {
+        return (int) SharedPreferenceUtil.get(mContext, SpConstant.HIGH_SCORE, 0);
     }
 
     private void prepareTiles() {
@@ -409,6 +410,7 @@ public class GameController {
             recordHighScore();
         }
         onEndOfGame();
+
     }
 
     public void onAudioClick() {
@@ -442,8 +444,18 @@ public class GameController {
     }
 
 
+    public void onRecordHighScore() {
+        if (onFunctionClickListener != null) {
+            onFunctionClickListener.onRecordHighScore();
+        }
+    }
+
     public void setGameMode(int gameMode) {
         mView.setGameMode(gameMode);
+    }
+
+    public int getGameMode() {
+        return mView.getGameMode();
     }
 
     public void setOnFunctionClickListener(OnFunctionClickListener onFunctionClickListener) {

@@ -30,5 +30,10 @@ public interface OnFunctionClickListener {
      */
     void onEndOfGame();
 
+    /**
+     * record high score
+     */
+    void onRecordHighScore();
+
 
 }

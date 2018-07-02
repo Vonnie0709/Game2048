@@ -31,7 +31,7 @@ android {
 
             signingConfig signingConfigs.v2048
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            minifyEnabled true
+            minifyEnabled false
             zipAlignEnabled true     //Zipalign优化
             debuggable true
 

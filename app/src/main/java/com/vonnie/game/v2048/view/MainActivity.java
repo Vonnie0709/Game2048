@@ -9,12 +9,14 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 
+import com.vonnie.game.v2048.App;
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.constant.IntentConstant;
 import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.logic.GameController;
+import com.vonnie.game.v2048.utils.BitmapUtil;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.weiget.GameView;
 
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
      * code of request settlement view
      */
     private final static int REQUEST_CODE_SETTLEMENT = 1;
-
+    private GameView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
      * @param savedInstanceState
      */
     private void initView(Bundle savedInstanceState) {
-        GameView view = new GameView(getBaseContext());
+        view = new GameView(getBaseContext());
         gameController = new GameController(this, view);
         gameController.setOnFunctionClickListener(this);
         gameController.newGame();
@@ -178,9 +180,9 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             }
         }
 
-        gameController.currentScore = (long) SharedPreferenceUtil.get(this, SpConstant.SCORE, gameController.currentScore);
-        gameController.historyHighScore = (long) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, gameController.historyHighScore);
-        gameController.lastScore = (long) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, gameController.lastScore);
+        gameController.currentScore = (int) SharedPreferenceUtil.get(this, SpConstant.SCORE, gameController.currentScore);
+        gameController.historyHighScore = (int) SharedPreferenceUtil.get(this, SpConstant.HIGH_SCORE_TEMP, gameController.historyHighScore);
+        gameController.lastScore = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_SCORE, gameController.lastScore);
         gameController.canUndo = (boolean) SharedPreferenceUtil.get(this, SpConstant.CAN_UNDO, gameController.canUndo);
         gameController.gameState = (int) SharedPreferenceUtil.get(this, SpConstant.GAME_STATE, gameController.gameState);
         gameController.lastGameState = (int) SharedPreferenceUtil.get(this, SpConstant.UNDO_GAME_STATE, gameController.lastGameState);
@@ -228,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
     public void onMenuButtonClick() {
         Intent intent = new Intent(this, MenuActivity.class);
         startActivityForResult(intent, REQUEST_CODE_MENU);
+        App.getContext().shareBitmap = BitmapUtil.loadBitmapFromView(view);
     }
 
     @Override
@@ -254,6 +257,30 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
         intent.putExtra(IntentConstant.INTENT_SCORE, gameController.currentScore);
         intent.putExtra(IntentConstant.INTENT_GAME_STATUS, gameController.gameState);
         startActivityForResult(intent, REQUEST_CODE_SETTLEMENT);
+    }
+
+    @Override
+    public void onRecordHighScore() {
+        Log.i("ABC", "save -high");
+        saveHighScoreView();
+    }
+
+    private void saveHighScoreView() {
+        Tile[][] field = gameController.grid.field;
+        SharedPreferenceUtil.put(this, SpConstant.WIDTH, field.length);
+        SharedPreferenceUtil.put(this, SpConstant.HEIGHT, field.length);
+        for (int xx = 0; xx < field.length; xx++) {
+            for (int yy = 0; yy < field[0].length; yy++) {
+                if (field[xx][yy] != null) {
+                    SharedPreferenceUtil.put(this, "high" + xx + "_" + yy, field[xx][yy].getValue());
+                } else {
+                    SharedPreferenceUtil.put(this, "high" + xx + "_" + yy, 0);
+                }
+            }
+        }
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_MODE, gameController.getGameMode());
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_X_NUM, gameController.numSquaresX);
+        SharedPreferenceUtil.put(this, SpConstant.HIGH_SCORE_Y_NUM, gameController.numSquaresY);
     }
 
 
