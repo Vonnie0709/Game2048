@@ -134,7 +134,7 @@ public class ShareActivity extends BaseActivity implements View.OnClickListener 
                 MobclickAgent.onEvent(this, "share_click_commit");
                 Bitmap bitmap = BitmapUtil.loadBitmapFromView(mContainer);
                 UMImage image = new UMImage(ShareActivity.this, bitmap);
-                new ShareAction(this).withText(getString(shareDeclarationId)).withMedia(image).setDisplayList(SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE, SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE).setCallback(new ShareListener(this)).open();
+                new ShareAction(this).withText(getString(shareDeclarationId)).withMedia(image).setDisplayList(SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE,  SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE).setCallback(new ShareListener(this)).open();
                 break;
             default:
                 break;
