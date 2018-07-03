@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
-import com.squareup.leakcanary.LeakCanary;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
 import com.vonnie.game.v2048.cell.Tile;
@@ -27,10 +26,6 @@ public class GameApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-        LeakCanary.install(this);
         initUMeng();
     }
 
@@ -60,4 +55,5 @@ public class GameApp extends Application {
         }
         return channel;
     }
+
 }

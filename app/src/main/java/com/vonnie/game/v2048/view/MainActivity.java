@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Window;
 
+import com.umeng.analytics.MobclickAgent;
 import com.vonnie.game.v2048.app.GameApp;
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
@@ -22,7 +23,7 @@ import com.vonnie.game.v2048.weiget.GameView;
 /**
  * @author LongpingZou
  */
-public class MainActivity extends AppCompatActivity implements OnFunctionClickListener {
+public class MainActivity extends BaseActivity implements OnFunctionClickListener {
 
 
     /**
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             return;
         }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        PermissionUtil.checkStoragePermission(this, new PermissionUtil.PermissionListener() {
+        PermissionUtil.checkGamePermission(this, new PermissionUtil.PermissionListener() {
             @Override
             public void onFinish() {
 
@@ -233,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onMenuButtonClick() {
+        MobclickAgent.onEvent(this, "click_menu");
         GameApp app = GameApp.getContext();
         app.field = gameController.grid.field;
         app.gameMode = gameController.getGameMode();
@@ -245,16 +247,24 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
 
     @Override
     public void onMuteButtonClick() {
+        if (gameController.isAudioEnabled) {
+            MobclickAgent.onEvent(this, "click_audio_close");
+        } else {
+            MobclickAgent.onEvent(this, "click_audio_open");
+        }
+
         gameController.mute();
     }
 
     @Override
     public void onUndoButtonClick() {
+        MobclickAgent.onEvent(this, "click_undo");
         gameController.undoGame();
     }
 
     @Override
     public void onNewGameButtonClick() {
+        MobclickAgent.onEvent(this, "click_main_new_game");
         gameController.newGame();
     }
 

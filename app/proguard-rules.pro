@@ -112,4 +112,16 @@
 -keep class com.android.dingtalk.share.ddsharemodule.** { *; }
 -keepattributes Signature
 -keep class com.umeng.** {*;}
+-keep class com.umeng.** {*;}
 
+-keepclassmembers class * {
+   public <init> (org.json.JSONObject);
+}
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keep public class com.vonnie.game.v2048.R$*{
+public static final int *;
+}

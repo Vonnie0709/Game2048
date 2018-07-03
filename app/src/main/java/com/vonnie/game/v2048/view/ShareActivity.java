@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
@@ -29,7 +30,7 @@ import com.vonnie.game.v2048.weiget.ShareGameView;
  * @author LongpingZou
  * @date 2018/7/2
  */
-public class ShareActivity extends AppCompatActivity implements View.OnClickListener {
+public class ShareActivity extends BaseActivity implements View.OnClickListener {
 
     private LinearLayout mContainer;
     private TextView mShareScore;
@@ -133,9 +134,10 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.share_commit:
+                MobclickAgent.onEvent(this, "share_click_commit");
                 Bitmap bitmap = BitmapUtil.loadBitmapFromView(mContainer);
                 UMImage image = new UMImage(ShareActivity.this, bitmap);
-                new ShareAction(this).withText(getString(shareDeclarationId)).withMedia(image).setDisplayList(SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE, SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE).setCallback(new ShareListener()).open();
+                new ShareAction(this).withText(getString(shareDeclarationId)).withMedia(image).setDisplayList(SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE, SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE).setCallback(new ShareListener(this)).open();
                 break;
             default:
                 break;

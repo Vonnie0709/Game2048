@@ -22,10 +22,10 @@ public class PermissionUtil {
      * @param context
      * @param permissionListener
      */
-    public static void checkStoragePermission(Context context, final PermissionListener permissionListener) {
+    public static void checkGamePermission(Context context, final PermissionListener permissionListener) {
         AndPermission.with(context)
                 .runtime()
-                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE, Permission.READ_PHONE_STATE)
+                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE, Permission.READ_PHONE_STATE, Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION)
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
@@ -41,6 +41,7 @@ public class PermissionUtil {
                 })
                 .start();
     }
+
 
     public interface PermissionListener {
         /**

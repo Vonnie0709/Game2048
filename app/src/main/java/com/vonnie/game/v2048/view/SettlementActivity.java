@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.constant.Constants;
 import com.vonnie.game.v2048.constant.IntentConstant;
@@ -23,7 +24,7 @@ import static com.vonnie.game.v2048.logic.GameController.GAME_WIN;
  * @author LongpingZou
  * @date 2018/6/23
  */
-public class SettlementActivity extends AppCompatActivity implements View.OnClickListener {
+public class SettlementActivity extends BaseActivity implements View.OnClickListener {
 
 
     @Override
@@ -70,14 +71,17 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         Intent intent;
         switch (v.getId()) {
             case R.id.settlement_game_continue:
+                MobclickAgent.onEvent(this, "settlement_click_continue");
                 setResult(Constants.RESULT_CODE_ENDLESS);
                 finish();
                 break;
             case R.id.settlement_new_game:
+                MobclickAgent.onEvent(this, "settlement_click_new_game");
                 setResult(Constants.RESULT_CODE_NEW_GAME);
                 finish();
                 break;
             case R.id.settlement_game_share:
+                MobclickAgent.onEvent(this, "settlement_click_share");
                 intent = new Intent(SettlementActivity.this, ShareActivity.class);
                 intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 3);
                 startActivity(intent);
