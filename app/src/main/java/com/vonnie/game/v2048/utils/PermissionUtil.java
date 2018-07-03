@@ -25,13 +25,10 @@ public class PermissionUtil {
     public static void checkStoragePermission(Context context, final PermissionListener permissionListener) {
         AndPermission.with(context)
                 .runtime()
-                .permission(
-                        Permission.Group.STORAGE
-                )
+                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE, Permission.READ_PHONE_STATE)
                 .onGranted(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                        Log.i(TAG, "所有权限申请完成");
                         if (permissionListener != null) {
                             permissionListener.onFinish();
                         }
@@ -40,7 +37,6 @@ public class PermissionUtil {
                 .onDenied(new Action<List<String>>() {
                     @Override
                     public void onAction(List<String> data) {
-                        Log.i(TAG, "用户拒绝权限申请");
                     }
                 })
                 .start();

@@ -15,6 +15,7 @@ import com.vonnie.game.v2048.constant.IntentConstant;
 import com.vonnie.game.v2048.constant.SpConstant;
 import com.vonnie.game.v2048.listener.OnFunctionClickListener;
 import com.vonnie.game.v2048.logic.GameController;
+import com.vonnie.game.v2048.utils.PermissionUtil;
 import com.vonnie.game.v2048.utils.SharedPreferenceUtil;
 import com.vonnie.game.v2048.weiget.GameView;
 
@@ -48,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements OnFunctionClickLi
             return;
         }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        PermissionUtil.checkStoragePermission(this, new PermissionUtil.PermissionListener() {
+            @Override
+            public void onFinish() {
+
+            }
+        });
         initView(savedInstanceState);
     }
 
