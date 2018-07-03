@@ -25,7 +25,7 @@ android {
             zipAlignEnabled true     //Zipalign优化
             minifyEnabled true
             debuggable false
-
+            buildConfigField 'boolean','umengLog',"false"
         }
         debug {
 
@@ -34,7 +34,7 @@ android {
             minifyEnabled true
             zipAlignEnabled true     //Zipalign优化
             debuggable true
-
+            buildConfigField 'boolean','umengLog',"true"
         }
     }
 

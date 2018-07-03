@@ -9,7 +9,7 @@ import com.vonnie.game.v2048.R;
 import java.util.List;
 
 /**
- * @author longp
+ * @author LongpingZou
  * @date 2018/6/26
  */
 public class ModeAdapter extends BaseQuickAdapter<String, BaseViewHolder> {

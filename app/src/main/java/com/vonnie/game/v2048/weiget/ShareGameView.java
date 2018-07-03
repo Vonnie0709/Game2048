@@ -9,8 +9,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.vonnie.game.v2048.R;
@@ -215,11 +213,6 @@ public class ShareGameView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
-//        int resizeWidth = width * 4 / 5;
-//        int resizeHeight = height * 3 / 5;
-//        getLayout(resizeWidth, resizeHeight, width, height);
-//        createBackgroundBitmap(resizeWidth, resizeHeight);
-        Log.e("ABC", "width:" + width + " - height" + height);
         getLayout(width, height);
         createBackgroundBitmap(width, height);
         createBitmapCells();
@@ -410,7 +403,6 @@ public class ShareGameView extends View {
      * create  cells bg
      */
     private void createBitmapCells() {
-        Log.i("ABC", "cell:" + cellSize);
         Resources resources = getResources();
         int[] cellRectangleIds = getCellRectangleIds();
         paint.setTextAlign(Paint.Align.CENTER);
@@ -469,7 +461,6 @@ public class ShareGameView extends View {
     private void getLayout(int width, int height) {
         //considering rotating screen ,numSquaresY need to add 3 points
         cellSize = width / (numSquaresX + 1);
-        Log.i("ABC", "cellSize:" + cellSize);
         //calc width of grid spacing
         gridWidth = cellSize / (numSquaresX + 3);
 

@@ -1,7 +1,6 @@
 package com.vonnie.game.v2048.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;

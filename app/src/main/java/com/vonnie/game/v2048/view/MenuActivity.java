@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -53,29 +52,29 @@ public class MenuActivity extends BaseActivity implements View.OnClickListener {
         Intent intent;
         switch (v.getId()) {
             case R.id.menu_resume:
-                MobclickAgent.onEvent(this,"menu_click_back_game");
+                MobclickAgent.onEvent(this, "menu_click_back_game");
                 setResult(Constants.RESULT_CODE_RESUME);
                 finish();
                 break;
             case R.id.menu_new_game:
-                MobclickAgent.onEvent(this,"menu_click_new_game");
+                MobclickAgent.onEvent(this, "menu_click_new_game");
                 setResult(Constants.RESULT_CODE_NEW_GAME);
                 finish();
                 break;
             case R.id.menu_mode:
-                MobclickAgent.onEvent(this,"menu_click_mode_select");
+                MobclickAgent.onEvent(this, "menu_click_mode_select");
                 intent = new Intent(this, ModeActivity.class);
                 startActivityForResult(intent, 0);
                 break;
             case R.id.menu_share:
-                MobclickAgent.onEvent(this,"menu_click_share");
+                MobclickAgent.onEvent(this, "menu_click_share");
                 intent = new Intent(MenuActivity.this, ShareActivity.class);
                 //normal share
                 intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 0);
                 startActivity(intent);
                 break;
             case R.id.menu_high_score:
-                MobclickAgent.onEvent(this,"menu_click_high_score");
+                MobclickAgent.onEvent(this, "menu_click_high_score");
                 //high score share
                 intent = new Intent(MenuActivity.this, ShareActivity.class);
                 intent.putExtra(IntentConstant.INTENT_SHARE_TYPE, 1);

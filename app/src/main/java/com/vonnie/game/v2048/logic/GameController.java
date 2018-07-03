@@ -2,7 +2,6 @@ package com.vonnie.game.v2048.logic;
 
 import android.content.Context;
 import android.media.SoundPool;
-import android.util.Log;
 
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.Cell;
@@ -260,8 +259,6 @@ public class GameController {
                             // Set win state
                             gameState = gameState + GAME_WIN;
                             endGame();
-                        } else {
-                            Log.i("ABC", "merged.getValue():" + merged.getValue());
                         }
 
 

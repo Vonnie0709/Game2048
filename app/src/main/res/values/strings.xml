@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">2048</string>
+    <string name="app_name">2048多玩版</string>
     <string name="header">2048</string>
 
     <string name="high_score">历史最高</string>

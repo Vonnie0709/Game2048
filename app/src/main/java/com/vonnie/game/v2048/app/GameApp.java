@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
+import com.vonnie.game.v2048.BuildConfig;
 import com.vonnie.game.v2048.cell.Tile;
 import com.vonnie.game.v2048.constant.Constants;
 
@@ -34,7 +35,7 @@ public class GameApp extends Application {
     }
 
     private void initUMeng() {
-        UMConfigure.setLogEnabled(true);
+        UMConfigure.setLogEnabled(BuildConfig.umengLog);
         UMConfigure.init(this, Constants.UM_APP_KEY, getChannel(getApplicationContext()), UMConfigure.DEVICE_TYPE_PHONE, null);
         PlatformConfig.setSinaWeibo(Constants.WEIBO_APP_KEY, Constants.WEIBO_SECRET_KEY, "http://sns.whalecloud.com");
         PlatformConfig.setQQZone(Constants.QQ_APP_ID, Constants.QQ_APP_KEY);

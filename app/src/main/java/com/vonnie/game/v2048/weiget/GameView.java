@@ -9,14 +9,13 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 
 import com.vonnie.game.v2048.R;
 import com.vonnie.game.v2048.cell.AnimCell;
 import com.vonnie.game.v2048.cell.Tile;
-import com.vonnie.game.v2048.logic.GameController;
 import com.vonnie.game.v2048.listener.OnControlListener;
+import com.vonnie.game.v2048.logic.GameController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -227,7 +226,6 @@ public class GameView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
-        Log.i("ABC", "onsizeChange");
         getLayout(width, height);
         createBitmapCells();
         createBackgroundBitmap(width, height);
@@ -834,7 +832,6 @@ public class GameView extends View {
         loadGameModeAssets(gameMode);
         createBitmapCells();
         invalidate();
-        Log.i("ABC", "gameMode+++++:" + gameMode);
 
     }
 
